@@ -19,7 +19,7 @@ function SKOSEditor(options) {
     var OPTIONS = {
         RDF_LINK : function(uri){window.open(uri)},
         BASE_URI : "http://localhost:8080/LMF/resource/",
-        LANGUAGES_SUPPORTED : ["en","de"],
+        LANGUAGES_SUPPORTED : ["en","de","none"],
         ENDPOINT_SELECT : "http://localhost:8080/LMF/sparql/select",
         ENDPOINT_UPDATE : "http://localhost:8080/LMF/sparql/update",
         LANGUAGE : "en",
