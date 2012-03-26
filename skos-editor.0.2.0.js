@@ -24,7 +24,7 @@ function SKOSEditor(options) {
         ENDPOINT_UPDATE : "http://localhost:8080/LMF/sparql/update",
         LANGUAGE : "en",
         DEBUG : false,
-        CODE_BASE_URI : 'http://raw.github.com/shortomat/skosjs/master/'
+        CODE_BASE_URI : 'https://raw.github.com/shortomat/skosjs/master/'
     }
 
     $.extend(OPTIONS,options);
