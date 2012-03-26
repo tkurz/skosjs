@@ -549,7 +549,7 @@ function SKOSEditor(options) {
 
         var loader = new Loader();
 
-            $("#"+container).load(OPTIONS.HTML_BASE_URI+"html/search.html",function(){
+            $("#"+container).load(OPTIONS.CODE_BASE_URI+"html/search.html",function(){
                 var selected;
                 var input_field = $("#search_input");
                 var suggestions = $("#search_suggestion");
@@ -687,39 +687,39 @@ function SKOSEditor(options) {
 
         //load templates
         var literal_view_template;
-        $.get(OPTIONS.HTML_BASE_URI+"html/subviews/literal_view.html",function(data){
+        $.get(OPTIONS.CODE_BASE_URI+"html/subviews/literal_view.html",function(data){
             literal_view_template = $(data);
         });
         var literal_fix_template;
-        $.get(OPTIONS.HTML_BASE_URI+"html/subviews/literal_fix.html",function(data){
+        $.get(OPTIONS.CODE_BASE_URI+"html/subviews/literal_fix.html",function(data){
             literal_fix_template = $(data);
         });
         var literal_edit_template;
-        $.get(OPTIONS.HTML_BASE_URI+"html/subviews/literal_edit.html",function(data){
+        $.get(OPTIONS.CODE_BASE_URI+"html/subviews/literal_edit.html",function(data){
             literal_edit_template = $(data);
         });
         var add_template;
-        $.get(OPTIONS.HTML_BASE_URI+"html/subviews/add.html",function(data){
+        $.get(OPTIONS.CODE_BASE_URI+"html/subviews/add.html",function(data){
             add_template = $(data);
         });
         var text_view_template;
-        $.get(OPTIONS.HTML_BASE_URI+"html/subviews/text_view.html",function(data){
+        $.get(OPTIONS.CODE_BASE_URI+"html/subviews/text_view.html",function(data){
             text_view_template = $(data);
         });
         var text_fix_template;
-        $.get(OPTIONS.HTML_BASE_URI+"html/subviews/text_fix.html",function(data){
+        $.get(OPTIONS.CODE_BASE_URI+"html/subviews/text_fix.html",function(data){
             text_fix_template = $(data);
         });
         var text_edit_template;
-        $.get(OPTIONS.HTML_BASE_URI+"html/subviews/text_edit.html",function(data){
+        $.get(OPTIONS.CODE_BASE_URI+"html/subviews/text_edit.html",function(data){
             text_edit_template = $(data);
         });
         var concept_fix_template;
-        $.get(OPTIONS.HTML_BASE_URI+"html/subviews/concept_fix.html",function(data){
+        $.get(OPTIONS.CODE_BASE_URI+"html/subviews/concept_fix.html",function(data){
             concept_fix_template = $(data);
         });
         var concept_edit_template;
-        $.get(OPTIONS.HTML_BASE_URI+"html/subviews/concept_edit.html",function(data){
+        $.get(OPTIONS.CODE_BASE_URI+"html/subviews/concept_edit.html",function(data){
             concept_edit_template = $(data);
         });
 
@@ -727,7 +727,7 @@ function SKOSEditor(options) {
             var content = $("<div></div>");
             $("#" + container).empty().append(content);
             events.unbind("property-view");
-            content.load(OPTIONS.HTML_BASE_URI+"html/views/resource_view.html", function() {
+            content.load(OPTIONS.CODE_BASE_URI+"html/views/resource_view.html", function() {
                 $("#view_header_uri").text(uri);
                 $("#view_content").addClass(type);
                 $("#view_header_rdf_link").click(function(){OPTIONS.RDF_LINK(uri);});
@@ -1257,7 +1257,7 @@ function SKOSEditor(options) {
 
         function CreateConceptPopup(data) {
             $("#"+background).show();
-            $("#" + container).load(OPTIONS.HTML_BASE_URI+"html/popups/concept_creator.html", function() {
+            $("#" + container).load(OPTIONS.CODE_BASE_URI+"html/popups/concept_creator.html", function() {
                 $("#popup_title").text("Create "+getType(data.type));
                 $("#popup_close").click(function() {
                     close();
@@ -1319,7 +1319,7 @@ function SKOSEditor(options) {
 
         function SelectGraphPopup() {
             $("#"+background).show();
-            $("#" + container).load(OPTIONS.HTML_BASE_URI+"html/popups/graph_selector.html", function() {
+            $("#" + container).load(OPTIONS.CODE_BASE_URI+"html/popups/graph_selector.html", function() {
                 $("#popup_close").click(function() {
                     close();
                 });
