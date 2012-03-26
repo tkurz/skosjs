@@ -1,0 +1,49 @@
+<!--
+  ~ Copyright (c) 2012 Salzburg Research.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<style type="text/css">
+.view_header .header_uri {
+    margin: 5px;
+    padding: 5px 0 0;
+    font-size: 12px;
+    font-weight: normal;
+}
+#view_header_uri {
+    color: gray;
+    font-style: italic;
+    padding-top:3px;
+}
+    #view_header_rdf_link {
+       padding: 2px 0 3px 13px;
+       background: no-repeat url("img/rdf.jpg") 0 0px;
+        cursor: pointer;
+    }
+</style>
+<div class="view_header">
+    <h1 class="header_uri">
+        <span id="view_header_rdf_link" title="Open in Linked Data Browser">&nbsp;</span>
+        <span id="view_header_uri"></span>
+    </h1>
+</div>
+<!--<img id="view_content_loader" src='img/loader-small.gif' style='left: 50%;margin-left: -8px;position: relative;top: 50px'>-->
+<div id="view_content" style="margin:10px 0 0">
+    <div style="float:left;width: 50%">
+         <div  id="view_content_left" class="content"></div>
+    </div>
+    <div style="float:left;width: 50%">
+        <div id="view_content_right" class="content"></div>
+    </div>
+    <div style="clear:both;"></div>
+</div>

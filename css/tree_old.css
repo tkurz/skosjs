@@ -1,0 +1,58 @@
+/*
+ * Copyright (c) 2012 Salzburg Research.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+ul.tree, ul.tree ul { list-style-type: none; background: url(../img/vline.png) repeat-y; margin: 0; padding: 0; } ul.tree ul { margin-left: 10px; } ul.tree li { margin: 0; padding: 0 12px; line-height: 20px; background: url(../img/node.png) no-repeat; color: #0000ff; font-weight: bold; } ul.tree li.last { background: #fff url(../img/lastnode.png) no-repeat; }
+ul.tree a {cursor: pointer}
+ul.tree a.node {
+    cursor: pointer;
+    padding: 2px 10px 0;
+    border-radius: 10px 10px 10px 10px;
+    color: white;
+    font-weight: normal;
+    font-size: 12px;
+}
+ul.tree li a.minus {
+    background: #fff url('../img/minus.png') no-repeat 0 2px;
+    padding-left: 11px;
+}
+ul.tree li a.plus {
+    background: #fff url('../img/plus.png') no-repeat 0 2px;
+    padding-left: 11px;
+}
+ul.tree li a.loading {
+    background: #fff url('../img/loader-small.gif') no-repeat -1px 0;
+    padding-left: 11px;
+}
+ul.tree a.draggable {
+    background-position:right;
+    background: url('../img/draggable.gif') no-repeat right top;
+    padding-right: 20px;
+}
+ul.tree [draggable] {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+ul.tree a.graph{background-color: #001A66;}
+ul.tree a.scheme{background-color: #260099;}
+ul.tree a.top-concept{background-color:#730099;}
+ul.tree a.concept{background-color: #990073;}
+ul.tree a.activeNode {background-color:#FFC414 !important;color:black !important;}
+
+ul.tree a.dragover {
+    border: 2px dotted #000;
+}

@@ -1,0 +1,67 @@
+ul.menu {
+    position: relative;
+    font-size: 12px;
+    list-style:none outside none;
+    margin: 0;
+    padding: 0;
+}
+
+ul.menu  li{
+    background: none repeat scroll 0 0 #CCCCCC;
+    float: left;
+    cursor: pointer;
+}
+
+ul.menu  li:hover {
+    background-color: #FFC414;
+    position: relative;
+}
+ul.menu li a {
+    border-right: 1px solid #333333;
+    color: #222222;
+    display: block;
+    padding: 5px 8px 3px;
+    text-decoration: none;
+    border-bottom: medium none black;
+    height: 16px;
+}
+ul.menu ul {
+    list-style:none outside none;
+    visibility: hidden;
+    position: absolute;
+    left:-1px;
+    width: 220px;
+    margin: 0;
+    padding: 0;
+    color: black;
+    z-index: 1000;
+    border: 1px solid #000000;
+}
+ul.menu ul li{
+    background: none repeat scroll 0 0 #F6F6F6;
+    color: #000000;
+    float: none;
+    font-weight: normal;
+    margin: 0;
+    padding: 0;
+}
+
+ul.menu ul li a{
+    border-right: none;
+}
+
+ul.menu ul li.disabled {
+    cursor: default;
+    background-color: #F6F6F6;
+}
+ul.menu ul li.disabled a{
+    color: #BBBBBB;
+    font-style: italic;
+}
+ul.menu hr.seperator {
+    border: 0;
+    color: #001A66;
+    background-color: #001A66;
+    height: 2px;
+    margin:0;
+}
