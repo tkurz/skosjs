@@ -103,3 +103,9 @@ div.boxDragover {
     border-right: 2px dashed #FFC414 !important;
     border-bottom: 2px dashed #FFC414 !important;
 }
+
+    #view_header_rdf_link {
+       padding: 2px 0 3px 13px;
+       background: no-repeat url("../img/rdf.jpg") 0 0px;
+        cursor: pointer;
+    }

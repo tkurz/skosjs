@@ -1,0 +1,18 @@
+    #popup_close {
+        position: absolute;
+        right: 4px;
+        top:4px;
+        padding-left:12px;
+        background: no-repeat url("../img/close.gif") 0 0;
+        cursor: pointer;
+    }
+    .popup ul.project_list li {
+    background-image: url('../img/arrow-right.png');
+background-repeat: no-repeat;
+background-position: 8px 4px;
+padding-left: 20px;
+    margin-bottom: 2px;
+}
+    .popup_loading {
+        background: no-repeat url('../img/loader-small.gif') 0 0 transparent;
+    }
