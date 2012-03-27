@@ -36,7 +36,7 @@ function SKOSClient(options) {
         SKOSJS : "http://newmedialab.at/ns/2012/01/skosjs#"
     }
 
-    var sparqlClient = new SparqlClient();
+    var sparqlClient = new SparqlClient(OPTIONS.ENDPOINT_SELECT,OPTIONS.ENDPOINT_UPDATE);
 
     this.exists = {
         uri : function(uri, onsuccess, onfailure) {
@@ -274,94 +274,5 @@ function SKOSClient(options) {
             (hours<10?("0"+hours):hours)+":"+
             (minutes<10?("0"+minutes):minutes)+":"+
             (seconds<10?("0"+seconds):seconds);
-    }
-
-    function SparqlClient() {
-        var HTTP = new HTTP_Client();
-        this.select = function(query,onsuccess,onfailure) {
-            HTTP.get(OPTIONS.ENDPOINT_SELECT,{query:encodeURIComponent(query)},null,"application/sparql-results+json",{
-                200:function(data){if(onsuccess)onsuccess(JSON.parse(data).results.bindings)},
-                "default":function(err){if(onfailure)onfailure(err)}
-            });
-        }
-        this.ask = function(query,onsuccess,onfailure) {
-            HTTP.get(OPTIONS.ENDPOINT_SELECT,{query:encodeURIComponent(query)},null,"application/sparql-results+json",{
-                200:function(data){if(onsuccess)onsuccess(JSON.parse(data).boolean)},
-                "default":function(err){if(onfailure)onfailure(err)}
-            });
-        }
-        this.update = function(query,onsuccess,onfailure) {
-            HTTP.post(OPTIONS.ENDPOINT_UPDATE,null,query,"application/sparql-update",{
-                200:function(){if(onsuccess)onsuccess()},
-                204:function(){if(onsuccess)onsuccess()},
-                "default":function(err){if(onfailure)onfailure(err)}
-            });
-        }
-    }
-
-    /**
-     * HTTP Client based on XMLHTTPRequest Object, allows RESTful interaction (GET;PUT;POST;DELETE)
-     * @param url
-     */
-    function HTTP_Client() {
-
-        function createRequest() {
-            var request = null;
-            if (window.XMLHttpRequest) {
-                request = new XMLHttpRequest();
-            } else if (window.ActiveXObject) {
-                request = new ActiveXObject("Microsoft.XMLHTTP");
-            } else {
-                throw "request object can not be created"
-            }
-            return request;
-        }
-
-        //build a query param string
-        function buildQueryParms(params) {
-            if(params==null||params.length==0) return "";
-            var s="?"
-            for(prop in params) {
-                s+=prop+"="+params[prop]+"&";
-            } return s.substring(0,s.length-1);
-        }
-
-        //fire request, the method takes a callback object which can contain several callback functions for different HTTP Response codes
-        function doRequest(method,path,queryParams,data,mimetype,callbacks) {
-            mimetype = mimetype ||  "application/json";
-            var _url = path+buildQueryParms(queryParams);
-             var request = createRequest();
-             request.onreadystatechange = function() {
-                if (request.readyState==4) {
-                    if(callbacks.hasOwnProperty(request.status)) {
-                        callbacks[request.status](request.responseText,request);
-                    } else if (callbacks.hasOwnProperty("default")) {
-                        callbacks["default"](request.responseText,request);
-                    } else {
-                        throw "Status:"+request.status+",Text:"+request.responseText;
-                    }
-                }
-             };
-             request.open(method, _url, true);
-             if(method=="PUT"||method=="POST")request.setRequestHeader("Content-Type",mimetype);
-             if(method=="GET")request.setRequestHeader("Accept",mimetype);
-             request.send( data );
-        }
-
-        this.get = function(path,queryParams,data,mimetype,callbacks) {
-             doRequest("GET",path,queryParams,data,mimetype,callbacks);
-        }
-
-        this.put = function(path,queryParams,data,mimetype,callbacks) {
-             doRequest("PUT",path,queryParams,data,mimetype,callbacks);
-        }
-
-        this.post = function(path,queryParams,data,mimetype,callbacks) {
-             doRequest("POST",path,queryParams,data,mimetype,callbacks);
-        }
-
-        this.delete = function(path,queryParams,data,mimetype,callbacks) {
-             doRequest("DELETE",path,queryParams,data,mimetype,callbacks);
-        }
     }
 }

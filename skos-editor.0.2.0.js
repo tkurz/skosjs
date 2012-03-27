@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 function SKOSEditor(options) {
 
     var OPTIONS = {
         RDF_LINK : function(uri){window.open(uri)},
         BASE_URI : "http://localhost:8080/LMF/resource/",
-        LANGUAGES_SUPPORTED : ["en","de","none"],
+        LANGUAGES_SUPPORTED : ["en","de"],
         ENDPOINT_SELECT : "http://localhost:8080/LMF/sparql/select",
         ENDPOINT_UPDATE : "http://localhost:8080/LMF/sparql/update",
         LANGUAGE : "en",
@@ -28,8 +27,9 @@ function SKOSEditor(options) {
 
     $.extend(OPTIONS,options);
 
-    //text,string: {title,property,type,multivalue,multilingual,editable}
-    //concept,uri: {title,property,type,multivalue,droppable,editable}
+    /**
+     * Properties for graph, schemes and concepts
+     */
     var PROPERTIES = {
         graph : {
             left:[
@@ -138,7 +138,7 @@ function SKOSEditor(options) {
     var resource = new Resource('col2');
     var popups = new Popups('popup','popup_background');
     var search = new Search('search');
-    var dragscroller = new DragScroller();
+    //var dragscroller = new DragScroller();
 
     //init views
     menu.init();
@@ -147,7 +147,7 @@ function SKOSEditor(options) {
     popups.init();
 
 
-    //the return object
+    //the return object for external interaction
     var return_object = {
         menu : {
             createMenuItem : function(name,subname,action) {
@@ -170,10 +170,14 @@ function SKOSEditor(options) {
     return return_object;
 
     /**
-     * Event Management
+     * Event Management: used by different views to trigger and react on events
      */
     function EventManager() {
         var bindings = [];
+        /**
+         * fires @see Event
+         * @param event
+         */
         this.fire = function(event) {
             if(!bindings[event.type])return;
             for(var i=0;i<bindings[event.type].length;i++) {
@@ -181,6 +185,12 @@ function SKOSEditor(options) {
             }
             if(OPTIONS.DEBUG)console.debug("Fired Event:",event);
         }
+        /**
+         * bind actions to events, name is used for unbinding
+         * @param type
+         * @param action a javascript function with parameter @see Event
+         * @param name
+         */
         this.bind = function(type,action,name){
             if(bindings[type] == undefined) bindings[type] = [];
             bindings[type].push(new Action(name,action));
@@ -202,12 +212,22 @@ function SKOSEditor(options) {
         }
     }
 
+    /**
+     * Used to pass type (@see EventCode), data and source to bound functions
+     * @param type
+     * @param data
+     * @param source
+     */
     function Event(type,data,source) {
         this.type = type;
         this.data = data;
         this.source = source;
     }
 
+    /**
+     * Creates Menu in container. The Object has functions to create MenuItems and (graphical) Seperators
+     * @param container_id
+     */
     function Menu(container_id) {
 
         var self = this;
@@ -221,6 +241,12 @@ function SKOSEditor(options) {
         this.init = function() {
             //not in use
         }
+        /**
+         * creates a submenu point (subname) on given menu point (name) triggering action.
+         * @param name
+         * @param subname
+         * @param action
+         */
         this.createMenuItem = function(name,subname,action) {
             if(!menu_items[name]) {
                 menu_items[name] = $("<li></li>").html("<a>"+name+"</a><ul></ul>").appendTo(menu);
@@ -238,6 +264,10 @@ function SKOSEditor(options) {
             })).appendTo(menu_items[name].find("ul"));
             return menu_point;
         }
+        /**
+         * creates a graphical sepertator on the bottom of the submenu list of menu 'name'
+         * @param name
+         */
         this.createSeperator = function(name) {
             $("<hr>").addClass("seperator").appendTo(menu_items[name].find("ul"));
         }
@@ -366,12 +396,14 @@ function SKOSEditor(options) {
             $("#"+container).empty().append(tree);
         }
 
+        //re(load) graph
         function init(event) {
             graph = {uri:event.data.uri,title:event.data.title};
             current = {uri:event.data.uri,type:'graph'};
             load();
         }
 
+        //select node (given by data.uri)
         function open(data) {
             $(".concept_"+current.uri.md5()).each(function(){
                 current = data;
@@ -386,6 +418,7 @@ function SKOSEditor(options) {
             events.fire(new Event(EventCode.CONCEPT.SELECTED,current,source));
         }
 
+        //load graph and schemes
         function load() {
             var _li = $("<li style='padding-left: 0'></li>").append("<a class='graph_leaf'>&nbsp;</a>").append($("<a></a>").text(graph.title).addClass('graph').attr("draggable",false).addClass("concept_"+graph.uri.md5()).addClass('node').click(function(){
                 $(".activeNode").removeClass('activeNode');
@@ -407,6 +440,7 @@ function SKOSEditor(options) {
             tree.children().last().addClass("last");
         }
 
+        //reload node
         function reload(uri) {
             $(".concept_"+uri.md5()).each(function(){
                 var type = $(this).attr("type");
@@ -425,6 +459,12 @@ function SKOSEditor(options) {
             }
         }
 
+        /**
+         * draw node given by data and type
+         * @param data
+         * @param type
+         * @param openOnLoad list subnodes after loading
+         */
         function createNode(data,type,openOnLoad) {
             var _title = data.title?data.title.value:data.uri.value;
             var _more = $("<a>&nbsp;</a>");
@@ -442,7 +482,7 @@ function SKOSEditor(options) {
             var current_uri = data.uri.value;
             var loadChildren = type=='scheme'? skos.list.top_concepts : skos.list.narrower;
             var _child_type = type=='scheme'?"top-concept":"concept";
-            if(data.children.value.bool()) {
+            if(data.children.value) {
                 _more.addClass('plus');
                 _more.click(function(){
                     if(_more.hasClass('plus')){
@@ -469,7 +509,7 @@ function SKOSEditor(options) {
             } else {
                _more.addClass('leaf');
             }
-            //draggable
+            //make concepts draggable and schemas + concepts dropable
             if(type!="scheme") {
                 _span.attr("draggable",true);
                 _span.addClass("draggable");
@@ -519,6 +559,7 @@ function SKOSEditor(options) {
             return _li;
         }
 
+        //on node-click
         function select(uri,type) {
             current = {uri:uri,type:type};
             events.fire(new Event(EventCode.CONCEPT.SELECTED,current,source));
@@ -529,6 +570,10 @@ function SKOSEditor(options) {
         //TODO
     }
 
+    /**
+     * Search with suggestions
+     * @param container
+     */
     function Search(container) {
         var graph;
         var source = this;
@@ -548,117 +593,128 @@ function SKOSEditor(options) {
 
         var loader = new Loader();
 
-            $("#"+container).load("html/search.html",function(){
-                var selected;
-                var input_field = $("#search_input");
-                var suggestions = $("#search_suggestion");
+        //load container
+        $("#" + container).load("html/search.html", function() {
+            var selected;
+            var input_field = $("#search_input");
+            var suggestions = $("#search_suggestion");
 
-                $("#search_div").focusout(function() {
-                    suggestions.hide();
-                });
-
-                input_field.keyup(function(e) {
-                    if(graph == null) {
-                        input_field.val("");
-                        alert("select a graph first");
-                    }
-                    var text = input_field.val();
-                    if(text.length >= minLenght) {
-                        if(e.keyCode==13) {
-                            if(selected) {
-                                events.fire(new Event(EventCode.CONCEPT.SELECTED,selected,source));
-                                suggestions.hide();
-                            } else alert("no results");
-                            return;
-                        }
-                        if(e.keyCode==38) {
-                            selected = {type:"concept"};
-                            e.preventDefault();
-                            var found = false;
-                            suggestions.children().each(function(){
-                                if($(this).hasClass('current')) {
-                                    found = true;
-                                    $(this).removeClass('current');
-                                    var prev = $(this).prev();
-                                    if(prev.length!=0) {
-                                        prev.addClass('current');
-                                        selected.uri = prev.attr("uri");
-                                        selected.title = prev.attr("name");
-                                    }
-                                    else found=false;
-                                    return false;
-                                }
-                            });
-                            if(!found) {
-                                suggestions.children().last().addClass('current');
-                                selected.uri = suggestions.children().last().attr("uri");
-                                selected.title = suggestions.children().last().attr("name");
-                            }
-                            return false;
-                        }
-                        if(e.keyCode==40) {
-                            selected = {type:"concept"};
-                            e.preventDefault();
-                            var found = false;
-                            suggestions.children().each(function(){
-                                if($(this).hasClass('current')) {
-                                    found = true;
-                                    $(this).removeClass('current');
-                                    var next = $(this).next();
-                                    if(next.length!=0) {
-                                        next.addClass('current');
-                                        selected.uri = next.attr("uri");
-                                        selected.title = next.attr("name");
-                                    }
-                                    else found=false;
-                                    return false;
-                                }
-                            });
-                            if(!found) {
-                                suggestions.children().first().addClass('current');
-                                selected.uri = suggestions.children().first().attr("uri");
-                                selected.title = suggestions.children().first().attr("name");
-                            }
-                            return false;
-                        }
-                        loader.set();
-                        skos.search.suggestion(graph,text,maxSuggestions,caseSensitive,function(data){
-                            suggestions.empty();
-                            selected = undefined;
-                            if(data.length==0) {
-                                suggestions.append("<span class='empty'>no results</span>");
-                            }
-                            for(var i=0; i<data.length;i++) {
-                                var regex = new RegExp( '(' + text + ')', 'gi' );
-                                var t = data[i].text.value.replace( regex, "<span>$1</span>" );
-                                var s = data[i].scheme?(" ("+data[i].scheme.value+")"):"";
-                                suggestions.append("<div name='"+data[i].text.value+"' uri='"+data[i].uri.value+"'>"+t+s+"</div>");
-                                if(i==0) {
-                                    (suggestions.children()).first().addClass('current');
-                                    selected = {uri:data[i].uri.value,title:data[i].text.value,type:'concept'};
-                                }
-                            }
-                            suggestions.show();
-                            loader.remove();
-                        },function(){alert("could not return suggestions")});
-                    } else suggestions.hide();
-                });
+            $("#search_div").focusout(function() {
+                suggestions.hide();
             });
 
-            function Loader() {
-                var i=0;
-                this.set = function() {
-                    if(i==0) $("#search_loader").show();
-                    i++;
+            //react on keypress
+            input_field.keyup(function(e) {
+                if (graph == null) {
+                    input_field.val("");
+                    alert("select a graph first");
                 }
-                this.remove = function() {
-                    i--;
-                    if(i==0) $("#search_loader").hide();
-                }
+                var text = input_field.val();
+                if (text.length >= minLenght) {
+                    //return
+                    if (e.keyCode == 13) {
+                        if (selected) {
+                            events.fire(new Event(EventCode.CONCEPT.SELECTED, selected, source));
+                            suggestions.hide();
+                        } else alert("no results");
+                        return;
+                    }
+                    //up
+                    if (e.keyCode == 38) {
+                        selected = {type:"concept"};
+                        e.preventDefault();
+                        var found = false;
+                        suggestions.children().each(function() {
+                            if ($(this).hasClass('current')) {
+                                found = true;
+                                $(this).removeClass('current');
+                                var prev = $(this).prev();
+                                if (prev.length != 0) {
+                                    prev.addClass('current');
+                                    selected.uri = prev.attr("uri");
+                                    selected.title = prev.attr("name");
+                                }
+                                else found = false;
+                                return false;
+                            }
+                        });
+                        if (!found) {
+                            suggestions.children().last().addClass('current');
+                            selected.uri = suggestions.children().last().attr("uri");
+                            selected.title = suggestions.children().last().attr("name");
+                        }
+                        return false;
+                    }
+                    //down
+                    if (e.keyCode == 40) {
+                        selected = {type:"concept"};
+                        e.preventDefault();
+                        var found = false;
+                        suggestions.children().each(function() {
+                            if ($(this).hasClass('current')) {
+                                found = true;
+                                $(this).removeClass('current');
+                                var next = $(this).next();
+                                if (next.length != 0) {
+                                    next.addClass('current');
+                                    selected.uri = next.attr("uri");
+                                    selected.title = next.attr("name");
+                                }
+                                else found = false;
+                                return false;
+                            }
+                        });
+                        if (!found) {
+                            suggestions.children().first().addClass('current');
+                            selected.uri = suggestions.children().first().attr("uri");
+                            selected.title = suggestions.children().first().attr("name");
+                        }
+                        return false;
+                    }
+                    loader.set();
+                    //load suggestions
+                    skos.search.suggestion(graph, text, maxSuggestions, caseSensitive, function(data) {
+                        suggestions.empty();
+                        selected = undefined;
+                        if (data.length == 0) {
+                            suggestions.append("<span class='empty'>no results</span>");
+                        }
+                        for (var i = 0; i < data.length; i++) {
+                            //show suggestions
+                            var regex = new RegExp('(' + text + ')', 'gi');
+                            var t = data[i].text.value.replace(regex, "<span>$1</span>");
+                            var s = data[i].scheme ? (" (" + data[i].scheme.value + ")") : "";
+                            suggestions.append("<div name='" + data[i].text.value + "' uri='" + data[i].uri.value + "'>" + t + s + "</div>");
+                            if (i == 0) {
+                                (suggestions.children()).first().addClass('current');
+                                selected = {uri:data[i].uri.value,title:data[i].text.value,type:'concept'};
+                            }
+                        }
+                        suggestions.show();
+                        loader.remove();
+                    }, function() {
+                        alert("could not return suggestions")
+                    });
+                } else suggestions.hide();
+            });
+        });
+
+        //show loader until the last request is served
+        function Loader() {
+            var i = 0;
+            this.set = function() {
+                if (i == 0) $("#search_loader").show();
+                i++;
             }
-            this.init = function() {
-                //nothing to do
+            this.remove = function() {
+                i--;
+                if (i == 0) $("#search_loader").hide();
             }
+        }
+
+        this.init = function() {
+            //nothing to do
+        }
         }
 
     /**
@@ -722,6 +778,7 @@ function SKOSEditor(options) {
             concept_edit_template = $(data);
         });
 
+        //show skos view
         function show(uri,type) {
             var content = $("<div></div>");
             $("#" + container).empty().append(content);
@@ -738,6 +795,7 @@ function SKOSEditor(options) {
             });
         }
 
+        //display in columns depending on configurations
         function createView(options) {
             for(var i=0;i<options.left.length;i++) {
                 var view = createPropertyView(options.left[i]);
@@ -751,7 +809,7 @@ function SKOSEditor(options) {
             }
         }
 
-        //vor allem für rerender
+        //event-binding for rerender (e.g. modified, broader, etc)
         function bindEvents(view) {
             switch(view.getType()) {
                 case "string":
@@ -816,6 +874,7 @@ function SKOSEditor(options) {
             }
         }
 
+        //different view-type for different types of properties
         function createPropertyView(options) {
             switch(options.type) {
                 case 'string': return new StringPropertyView(options.title,options.property,options.multilingual,options.multivalue,options.editable,false);
@@ -826,9 +885,13 @@ function SKOSEditor(options) {
         }
 
         /**
-         * property {de:value,en:value,none:value}
-         * @param name
-         * @param property
+         *
+         * @param title to show
+         * @param property as uri
+         * @param multilingual
+         * @param multivalue
+         * @param editable
+         * @param multiline text should have more then one line
          */
         function StringPropertyView(title,property,multilingual,multivalue,editable,multiline) {
             var box = $("<div></div>").addClass("content_box").append($("<h1></h1>").text(title));
@@ -851,9 +914,11 @@ function SKOSEditor(options) {
             function load(){
                 skos.list.values(graph,current.uri,property,write,function(){alert("could not list values "+property)});
             }
+            //write properties
             function write(data) {
                 container.empty();
                 var obj = {};
+                //order on language
                 for(var i=0; i<data.length;i++) {
                     if(data[i].value["xml:lang"]) {
                         if(!obj[data[i].value["xml:lang"]]) obj[data[i].value["xml:lang"]] = [];
@@ -880,6 +945,7 @@ function SKOSEditor(options) {
                 function createTable(data, language) {
                     var table = $("<table></table>").addClass("literal_table");
 
+                    // a single row
                     function createSingle(data) {
                         if(editable) {
                             var templ1 = multiline?text_view_template.clone():literal_view_template.clone();
@@ -931,6 +997,7 @@ function SKOSEditor(options) {
 
                     }
 
+                    //to add new rows
                     function createAdd() {
                         var templ = add_template.clone();
                         templ.find(".add").click(function() {
@@ -950,12 +1017,14 @@ function SKOSEditor(options) {
                         table.append(templ);
                     }
 
+                    //if value is not set and not editable
                     function createEmpty() {
                         var templ = literal_fix_template.clone();
                         templ.find(".literal_text").text("N/A");
                         table.append(templ);
                     }
 
+                    //organize display
                     if (data) {
                         for (var i = 0; i < data.length; i++) {
                             createSingle(data[i]);
@@ -976,6 +1045,13 @@ function SKOSEditor(options) {
             return this;
         }
 
+        /**
+         * to display and edit uris
+         * @param title
+         * @param property
+         * @param multivalue
+         * @param editable
+         */
         function UriPropertyView(title, property, multivalue, editable) {
             var box = $("<div></div>").addClass("content_box").append($("<h1></h1>").text(title));
             var container = $("<div></div>").appendTo(box);
@@ -999,6 +1075,7 @@ function SKOSEditor(options) {
                 });
             }
 
+            //write editable row
             function writeEditable(table,data) {
                 var templ1 = literal_view_template.clone();
                 var templ2 = literal_edit_template.clone();
@@ -1046,6 +1123,7 @@ function SKOSEditor(options) {
                 table.append(templ2);
             }
 
+            //write table
             function write(data) {
                 var table = $("<table></table>").addClass("literal_table");
                 var subview = $("<div></div>").addClass("view_subbox").append(table);
@@ -1073,6 +1151,7 @@ function SKOSEditor(options) {
                         table.append(templ);
                     }
                 }
+                //to add new value
                 function createAdd() {
                     var templ = add_template.clone();
                     templ.find(".add").click(function() {
@@ -1094,6 +1173,7 @@ function SKOSEditor(options) {
                 }
             }
 
+            //check if input is valid uri
             function check(value) {
                 var urlregex = new RegExp("^(http|https|ftp)\://([a-zA-Z0-9\.\-]+(\:[a-zA-Z0-9\.&amp;%\$\-]+)*@)*((25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9])\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])|([a-zA-Z0-9\-]+\.)*[a-zA-Z0-9\-]+\.(com|edu|gov|int|mil|net|org|biz|arpa|info|name|pro|aero|coop|museum|[a-zA-Z]{2}))(\:[0-9]+)*(/($|[a-zA-Z0-9\.\,\?\'\\\+&amp;%\$#\=~_\-]+))*$");
                 return urlregex.test(value);
@@ -1102,6 +1182,13 @@ function SKOSEditor(options) {
             return this;
         }
 
+        /**
+         * To show concepts (with dropable feature)
+         * @param title
+         * @param property
+         * @param droppable
+         * @param editable
+         */
         function ConceptPropertyView(title,property,droppable,editable) {
             var box = $("<div></div>").addClass("content_box").append($("<h1></h1>").text(title));
             var container = $("<div></div>").appendTo(box);
@@ -1125,6 +1212,7 @@ function SKOSEditor(options) {
                 });
             }
 
+            //write a single row
             function writeSingle(table,data) {
                 var title = data.title?data.title.value:data.uri.value;
                 if(editable) {
@@ -1164,6 +1252,7 @@ function SKOSEditor(options) {
                 }
             }
 
+            //write table
             function write(data) {
                 var table = $("<table></table>").addClass("literal_table");
                 var subview = $("<div></div>").addClass("view_subbox").append(table);
@@ -1179,6 +1268,7 @@ function SKOSEditor(options) {
                     }
                 }
 
+                //implement drop actions
                 if(droppable) {
                     subview.get(0).addEventListener('dragenter', function(e) {
                         content.addClass('boxDragover');
@@ -1254,6 +1344,10 @@ function SKOSEditor(options) {
 
         }
 
+        /**
+         * Create a concept
+         * @param data weather it should be a scheme, a top concept or a concept
+         */
         function CreateConceptPopup(data) {
             $("#"+background).show();
             $("#" + container).load("html/popups/concept_creator.html", function() {
@@ -1307,6 +1401,7 @@ function SKOSEditor(options) {
                     close();
                 });
             }
+            //get the type that should be generated
             function getType(parentType) {
                 switch(parentType) {
                     case 'graph':return 'scheme';
@@ -1316,6 +1411,9 @@ function SKOSEditor(options) {
             }
         }
 
+        /**
+         * Create or select a graph
+         */
         function SelectGraphPopup() {
             $("#"+background).show();
             $("#" + container).load("html/popups/graph_selector.html", function() {
@@ -1338,13 +1436,14 @@ function SKOSEditor(options) {
                         });
                     }
                 });
+                //list existing graphs
                 skos.list.graphs(function(data) {
                     $("#popup_loading").hide();
                     function appendItem(item) {
                         var title = (item.title) ? item.title.value : item.uri.value;
                         var button = $("<button></button>").text(title).click(function() {
                             graph = item.uri.value;
-                            events.fire(new Event(EventCode.GRAPH.SELECTED, {uri:item.uri.value,title:title,children:item.children.value.bool()}));
+                            events.fire(new Event(EventCode.GRAPH.SELECTED, {uri:item.uri.value,title:title,children:item.children.value}));
                             close();
                         });
                         $("#popup_list").append($("<li></li>").append(button));
@@ -1368,6 +1467,10 @@ function SKOSEditor(options) {
             }
         }
 
+        /**
+         * Settings for graph
+         * @param current
+         */
         function SettingsPopup(current) {
             if(current) alert("settings not implemented");
             else alert("preferences not implemented");
@@ -1478,6 +1581,6 @@ String.random = function (string_length) {
 	}
 	return randomstring;
 }
-String.prototype.bool = function() { return (/^true$/i).test(this);};
+//String.prototype.bool = function() { return (/^true$/i).test(this);};
 String.prototype.n3escape = function() {return this.replace(/(\r\n|\n|\r)/gm,"\\n");}
 String.prototype.n3escapeToHMTL = function() {return this.replace(/(\r\n|\n|\r)/gm,"<br/>");}

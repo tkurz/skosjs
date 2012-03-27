@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2012 Salzburg Research.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 div.view_subbox {
     padding:5px 3px 0 10px;
     position:relative;
@@ -14,7 +29,7 @@ div.view_uri_subbox {
 }
 
 div.view_uri_subbox div.droppable {
-    z-index: 2; background: url("../img/icons-symbols-gray.png") no-repeat scroll -274px -1183px transparent; right: 0pt; bottom: 0pt; position: absolute; width: 35px; height: 20px;
+    z-index: 2; background: url("http://www.webalys.com/premium/img/icons-symbols-gray.png") no-repeat scroll -274px -1183px transparent; right: 0pt; bottom: 0pt; position: absolute; width: 35px; height: 20px;
 }
 span.view_literal {
 
@@ -24,27 +39,27 @@ span.view_language {
 }
 span.view_button_edit {
     padding-left: 15px;
-    background: no-repeat url('../img/icons-symbols-gray.png') 2px 0;
+    background: no-repeat url('http://www.webalys.com/premium/img/icons-symbols-gray.png') 2px 0;
     cursor: pointer;
 }
 span.view_button_delete {
     padding-left: 15px;
-    background: no-repeat url('../img/icons-symbols-gray.png') -95px 0;
+    background: no-repeat url('http://www.webalys.com/premium/img/icons-symbols-gray.png') -95px 0;
     cursor: pointer;
 }
 span.view_button_save {
     padding-left: 15px;
-    background: no-repeat url('../img/icons-symbols-gray.png') -30px -863px;
+    background: no-repeat url('http://www.webalys.com/premium/img/icons-symbols-gray.png') -30px -863px;
     cursor: pointer;
 }
 span.view_button_cancel {
     padding-left: 15px;
-    background: no-repeat url('../img/icons-symbols-gray.png') -62px -1056px;
+    background: no-repeat url('http://www.webalys.com/premium/img/icons-symbols-gray.png') -62px -1056px;
     cursor: pointer;
 }
 span.view_button_add {
     padding-left: 14px;
-    background: no-repeat url('../img/icons-symbols-gray.png') -193px -1057px;
+    background: no-repeat url('http://www.webalys.com/premium/img/icons-symbols-gray.png') -193px -1057px;
     cursor: pointer;
 }
 

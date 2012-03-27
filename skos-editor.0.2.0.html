@@ -22,6 +22,7 @@
     <!-- TODO -->
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
     <script type="text/javascript" src="js/md5.js"></script>
+    <script type="text/javascript" src="js/sparql-client.js"></script>
     <script type="text/javascript" src="js/skos-client.js"></script>
     <script type="text/javascript" src="js/lmf/ioservice.js"></script>
     <script type="text/javascript" src="skos-editor.0.2.0.js"></script>
@@ -31,8 +32,8 @@
             RDF_LINK : function(uri){showRDF(uri)},
             BASE_URI : "http://localhost:8080/LMF/resource/",
             LANGUAGES_SUPPORTED : ["none","en","de"],
-            ENDPOINT_SELECT : "http://localhost:3030/ds/query",//"http://localhost:8080/LMF/sparql/select",
-            ENDPOINT_UPDATE : "http://localhost:3030/ds/update",//"http://localhost:8080/LMF/sparql/update",
+            ENDPOINT_SELECT : "http://localhost:8080/LMF/sparql/select",
+            ENDPOINT_UPDATE : "http://localhost:8080/LMF/sparql/update",
             LANGUAGE : "none",
             DEBUG : false
         }
@@ -54,6 +55,7 @@
     <link type="text/css" rel="stylesheet" href="css/editor.css">
     <link type="text/css" rel="stylesheet" href="css/view.css">
     <link type="text/css" rel="stylesheet" href="css/menu.css">
+    <link type="text/css" rel="stylesheet" href="css/popups.css">
 </head>
 <body>
 <div id="header1"></div>
