@@ -127,8 +127,8 @@ function SKOSEditor(options) {
             DELETED : 501
         },
         SETTINGS : {
-            CURRENT : 600,
-            PREFERENCES : 601
+            UPDATE : 600,
+            UPDATED : 601
         }
     }
 
@@ -285,17 +285,15 @@ function SKOSEditor(options) {
 
         self.createSeperator("Project");
 
-        var settings = self.createMenuItem("Project","Settings",function(){
+        var settings = self.createMenuItem("Project","Graph Settings",function(){
             if(settings.hasClass("disabled")) return false;
-            events.fire(new Event(EventCode.SETTINGS.CURRENT,current));
-        });
-        var preferences = self.createMenuItem("Project","Preferences",function(){
-            if(preferences.hasClass("disabled")) return false;
-            events.fire(new Event(EventCode.SETTINGS.PREFERENCES,current));
+            events.fire(new Event(EventCode.SETTINGS.UPDATE,current));
         });
 
         var about = self.createMenuItem("Help","About",function(){
-            alert("Some about info, maybe in a nicer style. TODO!");
+            $.get("html/about.html",function(data){
+                popups.info("About",data);
+            })
         });
 
         new_concept.addClass("disabled");
@@ -434,7 +432,7 @@ function SKOSEditor(options) {
                 _childs.children().last().addClass("last");
                 //select current
                 $(".concept_"+current.uri.md5()).first().click();
-            },function(){alert("could not load schemes")})
+            },function(){popups.alert("Alert","could not load schemes")})
             _li.append(_childs);
             tree.empty().append(_li);
             tree.children().last().addClass("last");
@@ -446,9 +444,9 @@ function SKOSEditor(options) {
                 var type = $(this).attr("type");
                 var container = $(this).parent();
                 if(type=="scheme") {
-                    skos.get.scheme(graph.uri,uri,function(data){rewrite(data,type,container)},function(){alert("could not reload scheme")});
+                    skos.get.scheme(graph.uri,uri,function(data){rewrite(data,type,container)},function(){popups.alert("Alert","could not reload scheme")});
                 } else {
-                    skos.get.concept(graph.uri,uri,function(data){rewrite(data,type,container)},function(){alert("could not reload scheme")});
+                    skos.get.concept(graph.uri,uri,function(data){rewrite(data,type,container)},function(){popups.alert("Alert","could not reload scheme")});
                 }
             });
             function rewrite(data,type,container) {
@@ -482,7 +480,7 @@ function SKOSEditor(options) {
             var current_uri = data.uri.value;
             var loadChildren = type=='scheme'? skos.list.top_concepts : skos.list.narrower;
             var _child_type = type=='scheme'?"top-concept":"concept";
-            if(data.children.value) {
+            if(data.children.value.bool()) {
                 _more.addClass('plus');
                 _more.click(function(){
                     if(_more.hasClass('plus')){
@@ -494,7 +492,7 @@ function SKOSEditor(options) {
                             _childs.children().last().addClass("last");
                             _more.removeClass('loading').addClass('minus');
                             _li.attr("closed","false");
-                        },function(){alert("could not load children")})
+                        },function(){popups.alert("Alert","could not load children")})
                     } else if(_more.hasClass('minus')){
                         _childs.empty();
                         _more.removeClass('minus').addClass('plus');
@@ -541,11 +539,11 @@ function SKOSEditor(options) {
                     if(type=='scheme') {
                         skos.set.topConcept(graph.uri,data.uri.value,uri,function(){
                             events.fire(new Event(EventCode.RELATION.CREATED,{type:"topConcept",parent:data.uri.value,child:uri},source));
-                        },function(){alert("could not add narrower")});
+                        },function(){popups.alert("Alert","could not add narrower")});
                     } else {
                         skos.set.broaderNarrower(graph.uri,data.uri.value,uri,function(){
                             events.fire(new Event(EventCode.RELATION.CREATED,{type:"broaderNarrower",broader:data.uri.value,narrower:uri},source));
-                        },function(){alert("could not add narrower")});
+                        },function(){popups.alert("Alert","could not add narrower")});
                     }
                     return false;
                 }, false);
@@ -564,10 +562,6 @@ function SKOSEditor(options) {
             current = {uri:uri,type:type};
             events.fire(new Event(EventCode.CONCEPT.SELECTED,current,source));
         }
-    }
-
-    function Confirm(options,onfirst,onsecond) {
-        //TODO
     }
 
     /**
@@ -607,7 +601,7 @@ function SKOSEditor(options) {
             input_field.keyup(function(e) {
                 if (graph == null) {
                     input_field.val("");
-                    alert("select a graph first");
+                    popups.info("Info","select a graph first");
                 }
                 var text = input_field.val();
                 if (text.length >= minLenght) {
@@ -616,7 +610,7 @@ function SKOSEditor(options) {
                         if (selected) {
                             events.fire(new Event(EventCode.CONCEPT.SELECTED, selected, source));
                             suggestions.hide();
-                        } else alert("no results");
+                        } else popups.info("Info","no results");
                         return;
                     }
                     //up
@@ -693,7 +687,7 @@ function SKOSEditor(options) {
                         suggestions.show();
                         loader.remove();
                     }, function() {
-                        alert("could not return suggestions")
+                        popups.alert("Alert","could not return suggestions")
                     });
                 } else suggestions.hide();
             });
@@ -912,7 +906,7 @@ function SKOSEditor(options) {
 
             //get properties
             function load(){
-                skos.list.values(graph,current.uri,property,write,function(){alert("could not list values "+property)});
+                skos.list.values(graph,current.uri,property,write,function(){popups.alert("Alert","could not list values "+property)});
             }
             //write properties
             function write(data) {
@@ -1005,7 +999,7 @@ function SKOSEditor(options) {
                             var inp = prompt("Set value for '"+title+"' "+lang, "");
                             if (inp != null) {
                                 if (inp == "") {
-                                    alert("value must not be empty");
+                                    popups.alert("Alert","value must not be empty");
                                 } else {
                                     skos.set.value(graph,current.uri,property,inp,language,function(){
                                         events.fire(new Event(EventCode.PROPERTY.CREATED,{uri:current.uri,property:property,language:language,value:inp},source));
@@ -1071,7 +1065,7 @@ function SKOSEditor(options) {
             //get properties
             function load() {
                 skos.list.values(graph, current.uri, property, write, function() {
-                    alert("could not list values " + property)
+                    popups.alert("Alert","could not list values " + property)
                 });
             }
 
@@ -1103,7 +1097,7 @@ function SKOSEditor(options) {
                             templ1.show();
                         });
                     } else {
-                        alert(newT + " is not a valid url");
+                        popups.alert("Alert",newT + " is not a valid url");
                     }
                 });
                 templ2.find(".literal_cancel").click(function() {
@@ -1158,14 +1152,14 @@ function SKOSEditor(options) {
                         var inp = prompt("Set value for '" + title + "'");
                         if (inp != null) {
                             if (inp == "") {
-                                alert("value must not be empty");
+                                popups.alert("Alert","value must not be empty");
                             } else if(check(inp)){
                                 skos.set.uri(graph, current.uri, property, inp, function() {
                                     events.fire(new Event(EventCode.PROPERTY.CREATED, {uri:current.uri,property:property,value:inp}, source));
                                     load();
                                 });
                             } else {
-                                alert(inp+" is not a valid url");
+                                popups.alert("Alert",inp+" is not a valid url");
                             }
                         }
                     });
@@ -1208,7 +1202,7 @@ function SKOSEditor(options) {
             //get properties
             function load() {
                 skos.list.concepts(graph, current.uri, property, write, function() {
-                    alert("could not list values " + property);
+                    popups.alert("Alert","could not list values " + property);
                 });
             }
 
@@ -1224,25 +1218,25 @@ function SKOSEditor(options) {
                          if(property=="http://www.w3.org/2004/02/skos/core#broader") {
                              skos.delete.broaderNarrower(graph,data.uri.value,current.uri,function(){
                                  events.fire(new Event(EventCode.RELATION.DELETED,{type:"broader",narrower:current.uri,broader:data.uri.value},source));
-                             },function(){alert("could not delete relation")});
+                             },function(){popups.alert("Alert","could not delete relation")});
                          } else if(property=="http://www.w3.org/2004/02/skos/core#narrower") {
                               skos.delete.broaderNarrower(graph,current.uri,data.uri.value,function(){
                                   events.fire(new Event(EventCode.RELATION.DELETED,{type:"narrower",narrower:data.uri.value,broader:current.uri},source));
-                             },function(){alert("could not delete relation")});
+                             },function(){popups.alert("Alert","could not delete relation")});
                          } else if((property=="http://www.w3.org/2004/02/skos/core#hasTopConcept")) {
                               skos.delete.topConcept(graph,current.uri,data.uri.value,function(){
                                   events.fire(new Event(EventCode.RELATION.DELETED,{type:"topConcept",parent:current.uri,child:data.uri.value},source));
-                             },function(){alert("could not delete relation")});
+                             },function(){popups.alert("Alert","could not delete relation")});
                          } else if((property=="http://www.w3.org/2004/02/skos/core#related")) {
                               skos.delete.related(graph,current.uri,data.uri.value,function(){
                                   events.fire(new Event(EventCode.RELATION.DELETED,{type:"related",concept1:current.uri,concept2:data.uri.value},source));
                                   load();
-                              },function(){alert("could not delete relation")});
+                              },function(){popups.alert("Alert","could not delete relation")});
                          }  else {
                             skos.delete.uri(graph,current.uri,property,data.uri.value,function(){
                                   events.fire(new Event(EventCode.RELATION.CREATED,{type:property,concept1:current.uri,concept2:data.uri.value},source));
                                   load();
-                             },function(){alert("could not create relation")});
+                             },function(){popups.alert("Alert","could not create relation")});
                          }
                     })
                 } else {
@@ -1292,25 +1286,25 @@ function SKOSEditor(options) {
                         if(property=="http://www.w3.org/2004/02/skos/core#broader") {
                              skos.set.broaderNarrower(graph,uri,current.uri,function(){
                                  events.fire(new Event(EventCode.RELATION.CREATED,{type:"broader",broader:uri,narrower:current.uri},source));
-                             },function(){alert("could not delete relation")});
+                             },function(){popups.alert("Alert","could not delete relation")});
                          } else if(property=="http://www.w3.org/2004/02/skos/core#narrower") {
                               skos.set.broaderNarrower(graph,current.uri,uri,function(){
                                   events.fire(new Event(EventCode.RELATION.CREATED,{type:"narrower",narrower:uri,broader:current.uri},source));
-                             },function(){alert("could not delete relation")});
+                             },function(){popups.alert("Alert","could not delete relation")});
                          } else if((property=="http://www.w3.org/2004/02/skos/core#hasTopConcept")) {
                               skos.set.topConcept(graph,current.uri,uri,function(){
                                   events.fire(new Event(EventCode.RELATION.CREATED,{type:"topConcept",parent:current.uri,child:uri},source));
-                             },function(){alert("could not delete relation")});
+                             },function(){popups.alert("Alert","could not delete relation")});
                          } else if((property=="http://www.w3.org/2004/02/skos/core#related")) {
                               skos.set.related(graph,current.uri,uri,function(){
                                   events.fire(new Event(EventCode.RELATION.CREATED,{type:"related",concept1:current.uri,concept2:uri},source));
                                   load();
-                             },function(){alert("could not create relation")});
+                             },function(){popups.alert("Alert","could not create relation")});
                          }  else {
                               skos.set.uri(graph,current.uri,property,uri,function(){
                                   events.fire(new Event(EventCode.RELATION.CREATED,{type:property,concept1:current.uri,concept2:uri},source));
                                   load();
-                             },function(){alert("could not create relation")});
+                             },function(){popups.alert("Alert","could not create relation")});
                          }
                         content.removeClass('boxDragover');
                         return false;
@@ -1334,14 +1328,53 @@ function SKOSEditor(options) {
         events.bind(EventCode.CONCEPT.CREATE,function(event){
             new CreateConceptPopup(event.data);
         })
-        events.bind(EventCode.SETTINGS.CURRENT,function(event){
-            new SettingsPopup(graph);
-        })
-        events.bind(EventCode.SETTINGS.PREFERENCES,function(event){
+        events.bind(EventCode.SETTINGS.UPDATE,function(){
             new SettingsPopup();
         })
         this.init = function() {
 
+        }
+        this.alert = function(title,message) {
+            new Alert(title,message);
+        }
+        this.info = function(title,message) {
+            new Info(title,message);
+        }
+
+        function Confirm() {
+            //TODO
+        }
+
+        function Alert(title,message,action) {
+            $("#"+background).show();
+            $("#" + container).load("html/popups/alert.html", function() {
+                $("#popup_title").text(title);
+                $("#popup_message").html(message);
+                $("#popup_close").click(function() {
+                    close();
+                    if(action)action();
+                });
+                $("#popup_cancel").click(function() {
+                    close();
+                    if(action)action();
+                });
+            });
+        }
+
+        function Info(title,message,action) {
+            $("#"+background).show();
+            $("#" + container).load("html/popups/info.html", function() {
+                $("#popup_title").text(title);
+                $("#popup_message").html(message);
+                $("#popup_close").click(function() {
+                    close();
+                    if(action)action();
+                });
+                $("#popup_cancel").click(function() {
+                    close();
+                    if(action)action();
+                });
+            });
         }
 
         /**
@@ -1357,7 +1390,7 @@ function SKOSEditor(options) {
                 });
                 $("#popup_create").click(function() {
                     if ($("#popup_input").val() == "") {
-                        alert("name is mandatory");
+                        popups.info("Info","name is mandatory");
                     } else {
                         var uri = OPTIONS.BASE_URI + String.random(8);
                         var title = $("#popup_input").val();
@@ -1369,18 +1402,12 @@ function SKOSEditor(options) {
                     }
                 });
             });
-            function close(){
-                $("#" + container).empty();
-                $("#"+background).hide();
-
-            }
             function createScheme(uri,title) {
                 skos.create.scheme(graph,uri,title,function() {
                     events.fire(new Event(EventCode.SCHEME.CREATED, {parent:parent,uri:uri,type:'scheme'}));
                     close();
                 }, function() {
-                    alert("could not create concept");
-                    close();
+                    popups.alert("Alert","could not create concept",close);
                 });
             }
             function createTopConcept(parent,uri,title) {
@@ -1388,8 +1415,7 @@ function SKOSEditor(options) {
                     events.fire(new Event(EventCode.CONCEPT.CREATED, {parent:parent,uri:uri,type:'top-concept'}));
                     close();
                 }, function() {
-                    alert("could not create concept");
-                    close();
+                    popups.alert("Alert","could not create concept",close);
                 });
             }
             function createConcept(parent,uri,title) {
@@ -1397,8 +1423,7 @@ function SKOSEditor(options) {
                     events.fire(new Event(EventCode.CONCEPT.CREATED, {parent:parent,uri:uri,type:'concept'}));
                     close();
                 }, function() {
-                    alert("could not create concept");
-                    close();
+                    popups.alert("Alert","could not create concept",close);
                 });
             }
             //get the type that should be generated
@@ -1422,7 +1447,7 @@ function SKOSEditor(options) {
                 });
                 $("#popup_create").click(function() {
                     if ($("#popup_input").val() == "") {
-                        alert("name is mandatory");
+                        popups.info("Info","name is mandatory");
                     } else {
                         var uri = OPTIONS.BASE_URI + String.random(8);
                         var title = $("#popup_input").val();
@@ -1431,8 +1456,7 @@ function SKOSEditor(options) {
                             events.fire(new Event(EventCode.GRAPH.CREATED, {uri:uri,title:title,children:false}));
                             close();
                         }, function() {
-                            alert("could not create graph");
-                            close();
+                            popups.alert("Alert","could not create graph",close);
                         });
                     }
                 });
@@ -1456,27 +1480,28 @@ function SKOSEditor(options) {
                         $("#popup_empty_list").show();
                     }
                 }, function() {
-                    alert("could not list graphs");
-                    close();
+                    popups.alert("Alert","could not list graphs",close);
                 });
             });
-            function close(){
-                $("#" + container).empty();
-                $("#"+background).hide();
-
-            }
         }
 
         /**
          * Settings for graph
          * @param current
          */
-        function SettingsPopup(current) {
-            if(current) alert("settings not implemented");
-            else alert("preferences not implemented");
+        function SettingsPopup() {
+            popups.info("Info","settings not implemented");
+        }
+
+        function close(){
+            $("#" + container).empty();
+            $("#"+background).hide();
         }
     }
 
+    /**
+     * Shouls support drag scrolling
+     */
     function DragScroller() {
 
         var speed = 15;
@@ -1581,6 +1606,6 @@ String.random = function (string_length) {
 	}
 	return randomstring;
 }
-//String.prototype.bool = function() { return (/^true$/i).test(this);};
+String.prototype.bool = function() { return (/^true$/i).test(this);};
 String.prototype.n3escape = function() {return this.replace(/(\r\n|\n|\r)/gm,"\\n");}
 String.prototype.n3escapeToHMTL = function() {return this.replace(/(\r\n|\n|\r)/gm,"<br/>");}

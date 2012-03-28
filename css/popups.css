@@ -33,3 +33,20 @@
 .popup_loading {
     background: no-repeat url('../img/loader-small.gif') 0 0 transparent;
 }
+
+.alert_title {
+    padding:6px;
+    background-color: #cc0000;
+    color: white;
+}
+
+.info_title {
+    padding:6px;
+    background-color: #9AE3F9;
+    color: black;
+}
+
+#about-skosjs {
+    padding-left: 60px;
+    background: no-repeat url('../img/logo.png') 0 0 transparent;
+}

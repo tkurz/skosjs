@@ -44,9 +44,8 @@
             var ioservice = new IOService(edtior);
         });
         
-        function showRDF(uri){//TODO:graph
-        	var query = "SELECT ?property ?value {GRAPH <http://localhost:8080/LMF/resource/bxXvbT93>{<"+uri+"> ?property ?value}}";alert(query);
-             window.open("http://localhost:3030/ds/query?query="+query);
+        function showRDF(uri){
+             window.open("http://localhost:8080/LMF/meta/text/html?uri="+encodeURIComponent(uri));
         }
     </script>
     <link type="text/css" rel="stylesheet" href="css/basic.css">
@@ -70,7 +69,7 @@
         <div class="col" id="col2"></div>
     </div>
 </div>
-<div id="footer">powered by SNML-TNG</div>
+<div id="footer"><a href="http://www.salzburgresearch.at/">Salzburg Research</a></div>
 </div>
 <div id="popup"></div>
 <div id="popup_background"></div>

@@ -1,10 +1,77 @@
+<!--
+  ~ Copyright (c) 2012 Salzburg Research.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
     <title></title>
+    <!-- TODO -->
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="js/md5.js"></script>
+    <script type="text/javascript" src="js/sparql-client.js"></script>
+    <script type="text/javascript" src="js/skos-client.js"></script>
+    <script type="text/javascript" src="js/lmf/ioservice.js"></script>
+    <script type="text/javascript" src="skos-editor.0.2.0.js"></script>
+    <script type="text/javascript">
+
+        var OPTIONS = {
+            RDF_LINK : function(uri){showRDF(uri)},
+            BASE_URI : "http://localhost:8080/LMF/resource/",
+            LANGUAGES_SUPPORTED : ["en","de"],
+            ENDPOINT_SELECT : "http://labs.newmedialab.at/SKOS/sparql/select",
+            ENDPOINT_UPDATE : "http://labs.newmedialab.at/SKOS/sparql/update",
+            LANGUAGE : "en",
+            DEBUG : false
+        }
+
+        $(document).ready(function(){
+            var edtior = new SKOSEditor(OPTIONS);
+            //importer
+            var ioservice = new IOService(edtior);
+        });
+        
+        function showRDF(uri){
+             window.open("http://labs.newmedialab.at/SKOS/meta/text/html?uri="+encodeURIComponent(uri));
+        }
+    </script>
+    <link type="text/css" rel="stylesheet" href="css/basic.css">
+    <link type="text/css" rel="stylesheet" href="css/tree.css">
+    <link type="text/css" rel="stylesheet" href="css/search.css">
+    <link type="text/css" rel="stylesheet" href="css/editor.css">
+    <link type="text/css" rel="stylesheet" href="css/view.css">
+    <link type="text/css" rel="stylesheet" href="css/menu.css">
+    <link type="text/css" rel="stylesheet" href="css/popups.css">
 </head>
 <body>
-     <h1>Hello World</h1>
+<div id="header1"></div>
+<div id="header2"></div>
+<div id="header3">
+    <div id="menu"></div>
+    <div id="search"></div>
+</div>
+<div id="container2">
+    <div id="container1">
+        <div class="col" id="col1"></div>
+        <div class="col" id="col2"></div>
+    </div>
+</div>
+<div id="footer"><a href="http://www.salzburgresearch.at/">Salzburg Research</a></div>
+</div>
+<div id="popup"></div>
+<div id="popup_background"></div>
 </body>
 </html>
