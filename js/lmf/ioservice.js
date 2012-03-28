@@ -17,8 +17,8 @@ function IOService(editor) {
 
     function IOService() {
         editor.menu.createSeperator("Project");
-        var _import = editor.menu.createMenuItem("Project","Import",function(){Importer()});
-        var _export = editor.menu.createMenuItem("Project","Export",function(){Exporter()});
+        var _import = editor.menu.createMenuItem("Project","Import",function(){_importer.open()});
+        var _export = editor.menu.createMenuItem("Project","Export",function(){_exporter.open()});
         _import.addClass("disabled");
         _export.addClass("disabled");
 
@@ -34,11 +34,15 @@ function IOService(editor) {
     }
 
     function Importer() {
-        editor.popup.info("Implementation Message","Feature not yet implemented");
+        this.open = function(){
+            editor.popup.info("Implementation Message","Feature not yet implemented");
+        }
     }
 
     function Exporter() {
-        editor.popup.info("Implementation Message","Feature not yet implemented");
+        this.open = function(){
+            editor.popup.info("Implementation Message","Feature not yet implemented");
+        }
     }
 
 }
