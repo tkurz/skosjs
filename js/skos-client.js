@@ -33,7 +33,7 @@ function SKOSClient(options) {
         RDFS: "http://www.w3.org/2000/01/rdf-schema#",
         DC : "http://purl.org/dc/elements/1.1/",
         DC_TERMS : "http://purl.org/dc/terms/",
-        SKOSJS : "http://newmedialab.at/ns/2012/01/skosjs#"
+        SKOSJS : "http://tkurz.github.com/skosjs/ns/2012/03/"
     }
 
     var sparqlClient = new SparqlClient(OPTIONS.ENDPOINT_SELECT,OPTIONS.ENDPOINT_UPDATE);

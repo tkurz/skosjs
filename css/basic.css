@@ -75,13 +75,17 @@ body {
 }
 #footer {
     background-color: #001A66;
-    color: white;
     float: left;
-    font-size: 12px;
     height: 16px;
     padding-top: 3px;
     text-align: center;
     width: 100%;
+    font-size: 12px;
+    color: white;
+}
+#footer a{
+    font-size: 12px;
+    color: white;
 }
 #popup {
     position:absolute;
