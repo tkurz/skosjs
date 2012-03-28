@@ -29,7 +29,7 @@ div.view_uri_subbox {
 }
 
 div.view_uri_subbox div.droppable {
-    z-index: 2; background: url("http://www.webalys.com/premium/img/icons-symbols-gray.png") no-repeat scroll -274px -1183px transparent; right: 0pt; bottom: 0pt; position: absolute; width: 35px; height: 20px;
+    z-index: 2;right: 0pt; bottom: 0pt; position: absolute; width: 20px; height: 20px;color:#333333;
 }
 span.view_literal {
 
@@ -37,30 +37,11 @@ span.view_literal {
 span.view_language {
 
 }
-span.view_button_edit {
-    padding-left: 15px;
-    background: no-repeat url('http://www.webalys.com/premium/img/icons-symbols-gray.png') 2px 0;
+
+span.button {
     cursor: pointer;
-}
-span.view_button_delete {
-    padding-left: 15px;
-    background: no-repeat url('http://www.webalys.com/premium/img/icons-symbols-gray.png') -95px 0;
-    cursor: pointer;
-}
-span.view_button_save {
-    padding-left: 15px;
-    background: no-repeat url('http://www.webalys.com/premium/img/icons-symbols-gray.png') -30px -863px;
-    cursor: pointer;
-}
-span.view_button_cancel {
-    padding-left: 15px;
-    background: no-repeat url('http://www.webalys.com/premium/img/icons-symbols-gray.png') -62px -1056px;
-    cursor: pointer;
-}
-span.view_button_add {
-    padding-left: 14px;
-    background: no-repeat url('http://www.webalys.com/premium/img/icons-symbols-gray.png') -193px -1057px;
-    cursor: pointer;
+    font-size: 16px;
+    color:#333333;
 }
 
 input.view_literal_edit {

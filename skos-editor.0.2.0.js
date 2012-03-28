@@ -1251,7 +1251,7 @@ function SKOSEditor(options) {
                 var table = $("<table></table>").addClass("literal_table");
                 var subview = $("<div></div>").addClass("view_subbox").append(table);
                 if(droppable) {
-                    $("<div></div>").addClass("droppable").appendTo(subview);
+                    $("<div><i class='icon-share-alt'></i></div>").addClass("droppable").appendTo(subview);
                     subview.addClass("view_uri_subbox");
                 }
                 var content = $("<div></div>").addClass('list_values').append(subview);
