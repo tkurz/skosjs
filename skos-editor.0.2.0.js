@@ -165,6 +165,14 @@ function SKOSEditor(options) {
                 events.unbind(arguments.callee.caller.toString().md5(),type);
             }
         },
+        popup : {
+            info : function(title,message) {
+                popups.info(title,message);
+            },
+            alert : function(title,message) {
+                popups.alert(title,message);
+            }
+        },
         EventCode : EventCode
     }
     return return_object;
