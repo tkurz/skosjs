@@ -51,3 +51,7 @@
     padding-left: 60px;
     background: no-repeat url('../img/logo.png') 0 0 transparent;
 }
+
+#settingslist li.active{
+    background: no-repeat url('../img/arrow_white_right.png') right top;
+}

@@ -598,7 +598,7 @@ function SKOSEditor(options) {
                     events.fire(new Event(EventCode.CONCEPT.DRAGSTART));
                     this.style.opacity = '0.4';
                     //e.dataTransfer.effectAllowed = 'move';
-                    e.dataTransfer.setData('text/plain', data.uri.value);
+                    e.dataTransfer.setData('text/uri-list', data.uri.value);
                     //e.dataTransfer.setData('parent', parent_uri);
                 }, false);
                 _span.get(0).addEventListener('dragenter', function(e){
@@ -614,10 +614,22 @@ function SKOSEditor(options) {
                 }, false);
                 _span.get(0).addEventListener('drop', function(e){
                     if (e.stopPropagation) {e.stopPropagation();}
-                    var uri = e.dataTransfer.getData('text/plain');
+                    var uri = e.dataTransfer.getData('text/uri-list');
                     //var parent = e.dataTransfer.getData('parent');
                     //add and redraw
-                    if(uri==data.uri.value ) return false;
+                    e.preventDefault();
+                    //prevent other drops
+                    if(e.dataTransfer.getData('text/plain')) {
+                        popups.info("Not Allowed","This kind of drop is not allowed");
+                        return false;
+                    }
+                    if(uri==data.uri.value) {
+                        if(!confirm("Make concept child of itself?")) return false;
+                    }
+                    if(!uri || uri=="") {
+                        popups.info("Not Allowed","This kind of drop is not allowed");
+                        return false;
+                    }
                     if(type=='scheme') {
                         skos.set.topConcept(graph.uri,data.uri.value,uri,function(){
                             events.fire(new Event(EventCode.RELATION.CREATED,{type:"topConcept",parent:data.uri.value,child:uri},source));
@@ -1355,20 +1367,31 @@ function SKOSEditor(options) {
                         if (e.stopPropagation) {
                             e.stopPropagation();
                         }
-                        var uri = e.dataTransfer.getData('text/plain');
+                        var uri = e.dataTransfer.getData('text/uri-list');
+                        e.preventDefault();
+                        //prevent other drops
+                        if(e.dataTransfer.getData('text/plain')) {
+                            popups.info("Not Allowed","This kind of drop is not allowed");
+                            return false;
+                        }
+                        if(!uri || uri=="") {
+                            popups.info("Not Allowed","This kind of drop is not allowed");
+                            return false;
+                        }
+
                         var parent = e.dataTransfer.getData('parent');
                         if(property=="http://www.w3.org/2004/02/skos/core#broader") {
                              skos.set.broaderNarrower(graph,uri,current.uri,function(){
                                  events.fire(new Event(EventCode.RELATION.CREATED,{type:"broader",broader:uri,narrower:current.uri},source));
-                             },function(){popups.alert("Alert","could not delete relation")});
+                             },function(){popups.alert("Alert","could not set relation")});
                          } else if(property=="http://www.w3.org/2004/02/skos/core#narrower") {
                               skos.set.broaderNarrower(graph,current.uri,uri,function(){
                                   events.fire(new Event(EventCode.RELATION.CREATED,{type:"narrower",narrower:uri,broader:current.uri},source));
-                             },function(){popups.alert("Alert","could not delete relation")});
+                             },function(){popups.alert("Alert","could not set relation")});
                          } else if((property=="http://www.w3.org/2004/02/skos/core#hasTopConcept")) {
                               skos.set.topConcept(graph,current.uri,uri,function(){
                                   events.fire(new Event(EventCode.RELATION.CREATED,{type:"topConcept",parent:current.uri,child:uri},source));
-                             },function(){popups.alert("Alert","could not delete relation")});
+                             },function(){popups.alert("Alert","could not set relation");alert(2)});
                          } else if((property=="http://www.w3.org/2004/02/skos/core#related")) {
                               skos.set.related(graph,current.uri,uri,function(){
                                   events.fire(new Event(EventCode.RELATION.CREATED,{type:"related",concept1:current.uri,concept2:uri},source));
@@ -1571,6 +1594,7 @@ function SKOSEditor(options) {
                     close();
                 });
                 $("#popup_save").click(function() {
+                    alert("is not implemented yet");
                     events.fire(new Event(EventCode.SETTINGS.UPDATED));
                     close();
                 });
