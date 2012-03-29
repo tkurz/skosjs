@@ -120,7 +120,7 @@ function HTTP_Client() {
         doRequest("POST", path, queryParams, data, mimetype, callbacks);
     }
 
-    this.delete = function(path, queryParams, data, mimetype, callbacks) {
+    this._delete = function(path, queryParams, data, mimetype, callbacks) {
         doRequest("DELETE", path, queryParams, data, mimetype, callbacks);
     }
 }

@@ -161,7 +161,7 @@ function SKOSClient(options) {
         }
     }
 
-    this.delete = {
+    this._delete = {
         value : function(graph,uri,property,value,language,onsuccess, onfailure) {
             var datetime = currentDateTime();
             language = language&&language!='none'?"@"+language:"";
@@ -200,6 +200,12 @@ function SKOSClient(options) {
             if(OPTIONS.DEBUG)console.log(query);
             sparqlClient.select(query, onsuccess, onfailure);
         },
+        graph : function(graph,onsuccess, onfailure) {
+            var language = OPTIONS.LANGUAGE=='none'?"":OPTIONS.LANGUAGE;
+            var query = "SELECT DISTINCT ?title {GRAPH <"+graph+">{<"+graph+"> <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project>. Optional {<"+graph+"> <" + namespaces.DC + "title> ?title. FILTER (lang(?title) = '" + language + "')}}}";
+            if(OPTIONS.DEBUG)console.debug(query);
+            sparqlClient.select(query, onsuccess, onfailure)
+        },
         scheme : function(graph,uri,onsuccess, onfailure) {
             var language = OPTIONS.LANGUAGE=='none'?"":OPTIONS.LANGUAGE;
             var query = "SELECT DISTINCT ?title ?children {GRAPH <" + graph + "> {OPTIONAL { <"+uri+"> <" + namespaces.RDFS + "label> ?title. FILTER (lang(?title) = '" + language + "') }BIND ( EXISTS { <"+uri+">  <" + namespaces.SKOS + "hasTopConcept> ?x } AS ?children )}}";
@@ -217,7 +223,7 @@ function SKOSClient(options) {
     this.list = {
         graphs : function(onsuccess, onfailure) {
             var language = OPTIONS.LANGUAGE=='none'?"":OPTIONS.LANGUAGE;
-            var query = "SELECT DISTINCT ?uri ?title ?children {GRAPH ?uri{?uri <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project>. Optional {?uri <" + namespaces.DC + "title> ?title. FILTER (lang(?title) = '" + language + "')}.BIND ( EXISTS { ?s <" + namespaces.RDF + "type> <" + namespaces.SKOS + "ConceptScheme> } AS ?children )}}";
+            var query = "SELECT DISTINCT ?uri ?title {GRAPH ?uri{?uri <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project>. Optional {?uri <" + namespaces.DC + "title> ?title. FILTER (lang(?title) = '" + language + "')}}}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.select(query, onsuccess, onfailure);
         },

@@ -30,8 +30,9 @@
     margin-bottom: 2px;
 }
 
-.popup_loading {
+#popup_loading {
     background: no-repeat url('../img/loader-small.gif') 0 0 transparent;
+    padding-left: 20px;
 }
 
 .alert_title {
