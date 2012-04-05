@@ -21,7 +21,7 @@ function SKOSEditor(options) {
         LANGUAGES_SUPPORTED : ["en","de"],
         ENDPOINT_SELECT : "http://localhost:8080/LMF/sparql/select",
         ENDPOINT_UPDATE : "http://localhost:8080/LMF/sparql/update",
-        LANGUAGE : "en",
+        LANGUAGE : "en-gb",
         DEBUG : false,
         COOKIES_ENABLED : true,
         COOKIE_EXPIRE_DAYS : 7
@@ -35,7 +35,7 @@ function SKOSEditor(options) {
     var PROPERTIES = {
         graph : {
             left:[
-                {title:"Title",property:"http://purl.org/dc/elements/1.1/title",type:"string",multivalue:false,multilingual:true,editable:true},
+                {title:"Title",property:"http://purl.org/dc/elements/1.1/title",type:"string",multivalue:false,multilingual:false,editable:true},
                 {title:"Subject",property:"http://purl.org/dc/elements/1.1/subject",type:"string",multivalue:false,multilingual:true,editable:true},
                 {title:"Description",property:"http://purl.org/dc/elements/1.1/description",type:"text",multivalue:false,multilingual:true,editable:true}
             ],
@@ -77,7 +77,7 @@ function SKOSEditor(options) {
                 {title:"Hidden Label",property:"http://www.w3.org/2004/02/skos/core#hiddenLabel",type:"string",multivalue:true,multilingual:true,editable:true},
                 {title:"Created",property:"http://purl.org/dc/terms/created",type:"string",multivalue:false,multilingual:false,editable:false},
                 {title:"Modified",property:"http://purl.org/dc/terms/modified",type:"string",multivalue:false,multilingual:false,editable:false},
-                {title:"Definition",property:"http://www.w3.org/2004/02/skos/core#definition",type:"string",multivalue:false,multilingual:true,editable:true},
+                {title:"Definition",property:"http://www.w3.org/2004/02/skos/core#definition",type:"text",multivalue:false,multilingual:true,editable:true},
                 {title:"Hidden Label",property:"http://www.w3.org/2004/02/skos/core#hiddenLabel",type:"string",multivalue:true,multilingual:true,editable:true}
             ]
         }
@@ -144,7 +144,7 @@ function SKOSEditor(options) {
     var resource = new Resource('col2');
     var popups = new Popups('popup','popup_background');
     var search = new Search('search');
-    //var dragscroller = new DragScroller();
+    var dragscroller = new DragScroller();
 
     //init views
     menu.init();
@@ -273,14 +273,10 @@ function SKOSEditor(options) {
             graph = uri;
             //load settings !! TODO
             skos.get.graph(graph,function(data){
-                if(data.length>0) {
-                    var title = data[0].title?data[0].title.value:graph;
-                    events.fire(new Event(EventCode.GRAPH.LOAD,{uri:graph,title:title},self));
-                    if(OPTIONS.COOKIES_ENABLED) setCookie("graph",graph);
-                } else {
-                    if(OPTIONS.COOKIES_ENABLED) resetCookie("graph");
-                    popups.alert("Error","Could not load graph")
-                }
+                var title = graph;
+                if(data[0]&&data[0].title)title=data[0].title.value;
+                events.fire(new Event(EventCode.GRAPH.LOAD,{uri:graph,title:title},self));
+                if(OPTIONS.COOKIES_ENABLED) setCookie("graph",graph);
             },function(){popups.alert("Error","Could not load graph")})
         }
 
@@ -290,10 +286,15 @@ function SKOSEditor(options) {
         }
 
         this.init = function() {
-            self.reset();
             if(OPTIONS.COOKIES_ENABLED) {
                 var uri = getCookie("graph");
-                if(uri)events.fire(new Event(EventCode.GRAPH.SELECTED,{uri:uri}));
+                if(uri){
+                    //check if graph exists TODO
+                    events.fire(new Event(EventCode.GRAPH.SELECTED,{uri:uri}));
+                    //else
+                    //if(OPTIONS.COOKIES_ENABLED) resetCookie("graph");
+                    //popups.alert("Error","Could not load graph")
+                }
             }
         }
 
@@ -312,6 +313,8 @@ function SKOSEditor(options) {
         events.bind(EventCode.SETTINGS.UPDATED,function(){
             events.fire(new Event(EventCode.GRAPH.SELECTED,{uri:graph},self));
         });
+
+        self.reset();
     }
 
     /**
@@ -381,9 +384,7 @@ function SKOSEditor(options) {
         });
 
         var about = self.createMenuItem("Help","About",function(){
-            $.get("html/about.html",function(data){
-                popups.info("About",data);
-            })
+            popups.info("About",HTML_TEMPLATES.about);
         });
 
         new_concept.addClass("disabled");
@@ -418,23 +419,29 @@ function SKOSEditor(options) {
         });
         events.bind(EventCode.PROPERTY.UPDATED,function(event){
             if(event.data.language==settings.getLanguage()) {
-                if(event.data.property=="http://purl.org/dc/elements/1.1/title" || event.data.property=="http://www.w3.org/2004/02/skos/core#prefLabel" || event.data.property=="http://www.w3.org/2000/01/rdf-schema#label") {
+                if(event.data.property=="http://www.w3.org/2004/02/skos/core#prefLabel" || event.data.property=="http://www.w3.org/2000/01/rdf-schema#label") {
                     $(".concept_"+event.data.uri.md5()).text(event.data.value);
                 }
+            } else if(event.data.property=="http://purl.org/dc/elements/1.1/title") {
+               $(".concept_"+event.data.uri.md5()).text(event.data.value);
             }
         });
         events.bind(EventCode.PROPERTY.DELETED,function(event){
             if(event.data.language==settings.getLanguage()) {
-                if(event.data.property=="http://purl.org/dc/elements/1.1/title" || event.data.property=="http://www.w3.org/2004/02/skos/core#prefLabel" || event.data.property=="http://www.w3.org/2000/01/rdf-schema#label") {
+                if(event.data.property=="http://www.w3.org/2004/02/skos/core#prefLabel" || event.data.property=="http://www.w3.org/2000/01/rdf-schema#label") {
                     $(".concept_"+event.data.uri.md5()).text(event.data.uri);
                 }
+            } else if(event.data.property=="http://purl.org/dc/elements/1.1/title") {
+               $(".concept_"+event.data.uri.md5()).text(event.data.value);
             }
         });
         events.bind(EventCode.PROPERTY.CREATED,function(event){
             if(event.data.language==settings.getLanguage()) {
-                if(event.data.property=="http://purl.org/dc/elements/1.1/title" || event.data.property=="http://www.w3.org/2004/02/skos/core#prefLabel" || event.data.property=="http://www.w3.org/2000/01/rdf-schema#label") {
+                if(event.data.property=="http://www.w3.org/2004/02/skos/core#prefLabel" || event.data.property=="http://www.w3.org/2000/01/rdf-schema#label") {
                     $(".concept_"+event.data.uri.md5()).text(event.data.value);
                 }
+            }  else if(event.data.property=="http://purl.org/dc/elements/1.1/title") {
+               $(".concept_"+event.data.uri.md5()).text(event.data.value);
             }
         });
         events.bind(EventCode.CONCEPT.SELECTED,function(event){
@@ -667,7 +674,7 @@ function SKOSEditor(options) {
         var graph;
         var source = this;
 
-        events.bind(EventCode.GRAPH.LOAD,function(event){
+        events.bind(EventCode.GRAPH.LOAD, function(event) {
             graph = event.data.uri;
             $("#search_input").val("");
         });
@@ -679,109 +686,108 @@ function SKOSEditor(options) {
         var loader = new Loader();
 
         //load container
-        $("#" + container).load("html/search.html", function() {
-            var selected;
-            var input_field = $("#search_input");
-            var suggestions = $("#search_suggestion");
+        $("#" + container).html(HTML_TEMPLATES.search);
+        var selected;
+        var input_field = $("#search_input");
+        var suggestions = $("#search_suggestion");
 
-            $("#search_div").focusout(function() {
-                suggestions.hide();
-            });
+        $("#search_div").focusout(function() {
+            suggestions.hide();
+        });
 
-            //react on keypress
-            input_field.keyup(function(e) {
-                if (graph == null) {
-                    input_field.val("");
-                    popups.info("Info","select a graph first");
+        //react on keypress
+        input_field.keyup(function(e) {
+            if (graph == null) {
+                input_field.val("");
+                popups.info("Info", "select a graph first");
+            }
+            var text = input_field.val();
+            if (text.length >= minLenght) {
+                //return
+                if (e.keyCode == 13) {
+                    if (selected) {
+                        events.fire(new Event(EventCode.CONCEPT.SELECTED, selected, source));
+                        suggestions.hide();
+                    } else popups.info("Info", "no results");
+                    return;
                 }
-                var text = input_field.val();
-                if (text.length >= minLenght) {
-                    //return
-                    if (e.keyCode == 13) {
-                        if (selected) {
-                            events.fire(new Event(EventCode.CONCEPT.SELECTED, selected, source));
-                            suggestions.hide();
-                        } else popups.info("Info","no results");
-                        return;
-                    }
-                    //up
-                    if (e.keyCode == 38) {
-                        selected = {type:"concept"};
-                        e.preventDefault();
-                        var found = false;
-                        suggestions.children().each(function() {
-                            if ($(this).hasClass('current')) {
-                                found = true;
-                                $(this).removeClass('current');
-                                var prev = $(this).prev();
-                                if (prev.length != 0) {
-                                    prev.addClass('current');
-                                    selected.uri = prev.attr("uri");
-                                    selected.title = prev.attr("name");
-                                }
-                                else found = false;
-                                return false;
+                //up
+                if (e.keyCode == 38) {
+                    selected = {type:"concept"};
+                    e.preventDefault();
+                    var found = false;
+                    suggestions.children().each(function() {
+                        if ($(this).hasClass('current')) {
+                            found = true;
+                            $(this).removeClass('current');
+                            var prev = $(this).prev();
+                            if (prev.length != 0) {
+                                prev.addClass('current');
+                                selected.uri = prev.attr("uri");
+                                selected.title = prev.attr("name");
                             }
-                        });
-                        if (!found) {
-                            suggestions.children().last().addClass('current');
-                            selected.uri = suggestions.children().last().attr("uri");
-                            selected.title = suggestions.children().last().attr("name");
+                            else found = false;
+                            return false;
                         }
-                        return false;
-                    }
-                    //down
-                    if (e.keyCode == 40) {
-                        selected = {type:"concept"};
-                        e.preventDefault();
-                        var found = false;
-                        suggestions.children().each(function() {
-                            if ($(this).hasClass('current')) {
-                                found = true;
-                                $(this).removeClass('current');
-                                var next = $(this).next();
-                                if (next.length != 0) {
-                                    next.addClass('current');
-                                    selected.uri = next.attr("uri");
-                                    selected.title = next.attr("name");
-                                }
-                                else found = false;
-                                return false;
-                            }
-                        });
-                        if (!found) {
-                            suggestions.children().first().addClass('current');
-                            selected.uri = suggestions.children().first().attr("uri");
-                            selected.title = suggestions.children().first().attr("name");
-                        }
-                        return false;
-                    }
-                    loader.set();
-                    //load suggestions
-                    skos.search.suggestion(graph, text, maxSuggestions, caseSensitive, function(data) {
-                        suggestions.empty();
-                        selected = undefined;
-                        if (data.length == 0) {
-                            suggestions.append("<span class='empty'>no results</span>");
-                        }
-                        for (var i = 0; i < data.length; i++) {
-                            //show suggestions
-                            var regex = new RegExp('(' + text + ')', 'gi');
-                            var t = data[i].text.value.replace(regex, "<span>$1</span>");
-                            var s = data[i].scheme ? (" (" + data[i].scheme.value + ")") : "";
-                            suggestions.append("<div name='" + data[i].text.value + "' uri='" + data[i].uri.value + "'>" + t + s + "</div>");
-                            if (i == 0) {
-                                (suggestions.children()).first().addClass('current');
-                                selected = {uri:data[i].uri.value,title:data[i].text.value,type:'concept'};
-                            }
-                        }
-                        suggestions.show();
-                        loader.remove();
-                    }, function() {
-                        popups.alert("Alert","could not return suggestions")
                     });
-                } else suggestions.hide();
-            });
+                    if (!found) {
+                        suggestions.children().last().addClass('current');
+                        selected.uri = suggestions.children().last().attr("uri");
+                        selected.title = suggestions.children().last().attr("name");
+                    }
+                    return false;
+                }
+                //down
+                if (e.keyCode == 40) {
+                    selected = {type:"concept"};
+                    e.preventDefault();
+                    var found = false;
+                    suggestions.children().each(function() {
+                        if ($(this).hasClass('current')) {
+                            found = true;
+                            $(this).removeClass('current');
+                            var next = $(this).next();
+                            if (next.length != 0) {
+                                next.addClass('current');
+                                selected.uri = next.attr("uri");
+                                selected.title = next.attr("name");
+                            }
+                            else found = false;
+                            return false;
+                        }
+                    });
+                    if (!found) {
+                        suggestions.children().first().addClass('current');
+                        selected.uri = suggestions.children().first().attr("uri");
+                        selected.title = suggestions.children().first().attr("name");
+                    }
+                    return false;
+                }
+                loader.set();
+                //load suggestions
+                skos.search.suggestion(graph, text, maxSuggestions, caseSensitive, function(data) {
+                    suggestions.empty();
+                    selected = undefined;
+                    if (data.length == 0) {
+                        suggestions.append("<span class='empty'>no results</span>");
+                    }
+                    for (var i = 0; i < data.length; i++) {
+                        //show suggestions
+                        var regex = new RegExp('(' + text + ')', 'gi');
+                        var t = data[i].text.value.replace(regex, "<span>$1</span>");
+                        var s = data[i].scheme ? (" (" + data[i].scheme.value + ")") : "";
+                        suggestions.append("<div name='" + data[i].text.value + "' uri='" + data[i].uri.value + "'>" + t + s + "</div>");
+                        if (i == 0) {
+                            (suggestions.children()).first().addClass('current');
+                            selected = {uri:data[i].uri.value,title:data[i].text.value,type:'concept'};
+                        }
+                    }
+                    suggestions.show();
+                    loader.remove();
+                }, function() {
+                    popups.alert("Alert", "could not return suggestions")
+                });
+            } else suggestions.hide();
         });
 
         //show loader until the last request is served
@@ -800,7 +806,7 @@ function SKOSEditor(options) {
         this.init = function() {
             //nothing to do
         }
-        }
+    }
 
     /**
      * SKOS resource view
@@ -823,58 +829,38 @@ function SKOSEditor(options) {
         }
 
         //load templates
-        var literal_view_template;
-        $.get("html/subviews/literal_view.html",function(data){
-            literal_view_template = $(data);
-        });
-        var literal_fix_template;
-        $.get("html/subviews/literal_fix.html",function(data){
-            literal_fix_template = $(data);
-        });
-        var literal_edit_template;
-        $.get("html/subviews/literal_edit.html",function(data){
-            literal_edit_template = $(data);
-        });
-        var add_template;
-        $.get("html/subviews/add.html",function(data){
-            add_template = $(data);
-        });
-        var text_view_template;
-        $.get("html/subviews/text_view.html",function(data){
-            text_view_template = $(data);
-        });
-        var text_fix_template;
-        $.get("html/subviews/text_fix.html",function(data){
-            text_fix_template = $(data);
-        });
-        var text_edit_template;
-        $.get("html/subviews/text_edit.html",function(data){
-            text_edit_template = $(data);
-        });
-        var concept_fix_template;
-        $.get("html/subviews/concept_fix.html",function(data){
-            concept_fix_template = $(data);
-        });
-        var concept_edit_template;
-        $.get("html/subviews/concept_edit.html",function(data){
-            concept_edit_template = $(data);
-        });
+        var literal_view_template = HTML_TEMPLATES.views.resource.literal.view;
+        var literal_fix_template = HTML_TEMPLATES.views.resource.literal.fix;
+        var literal_edit_template = HTML_TEMPLATES.views.resource.literal.edit;
+        var add_template = HTML_TEMPLATES.views.resource.add;
+        var text_view_template = HTML_TEMPLATES.views.resource.text.view;
+        var text_fix_template = HTML_TEMPLATES.views.resource.text.fix;
+        var text_edit_template = HTML_TEMPLATES.views.resource.text.edit;
+        var concept_fix_template = HTML_TEMPLATES.views.resource.concept.fix;
+        var concept_edit_template = HTML_TEMPLATES.views.resource.concept.edit;
 
         //show skos view
         function show(uri,type) {
             var content = $("<div></div>");
             $("#" + container).empty().append(content);
             events.unbind("property-view");
-            content.load("html/views/resource_view.html", function() {
-                $("#view_header_uri").text(uri);
-                $("#view_content").addClass(type);
-                $("#view_header_rdf_link").click(function(){OPTIONS.RDF_LINK(uri);});
-                switch(type) {
-                    case 'graph': createView(PROPERTIES.graph);break;
-                    case 'scheme': createView(PROPERTIES.scheme);break;
-                    default: createView(PROPERTIES.concept);break;
-                }
+            content.html(HTML_TEMPLATES.views.resource.basic);
+            $("#view_header_uri").text(uri);
+            $("#view_content").addClass(type);
+            $("#view_header_rdf_link").click(function() {
+                OPTIONS.RDF_LINK(uri);
             });
+            switch (type) {
+                case 'graph':
+                    createView(PROPERTIES.graph);
+                    break;
+                case 'scheme':
+                    createView(PROPERTIES.scheme);
+                    break;
+                default:
+                    createView(PROPERTIES.concept);
+                    break;
+            }
         }
 
         //display in columns depending on configurations
@@ -1030,8 +1016,8 @@ function SKOSEditor(options) {
                     // a single row
                     function createSingle(data) {
                         if(editable) {
-                            var templ1 = multiline?text_view_template.clone():literal_view_template.clone();
-                            var templ2 = multiline?text_edit_template.clone():literal_edit_template.clone();
+                            var templ1 = multiline?$(text_view_template):$(literal_view_template);
+                            var templ2 = multiline?$(text_edit_template):$(literal_edit_template);
                             templ2.find(".literal_input").val(data);
                             templ1.find(".literal_text").html(data.n3escapeToHMTL());
                             templ1.find(".literal_text").attr('original',data);
@@ -1072,7 +1058,7 @@ function SKOSEditor(options) {
                             table.append(templ1);
                             table.append(templ2);
                         } else {
-                            var templ = multiline?text_fix_template.clone():literal_fix_template.clone();
+                            var templ = multiline?$(text_fix_template):$(literal_fix_template);
                             templ.find(".literal_text").text(data);
                             table.append(templ);
                         }
@@ -1081,7 +1067,7 @@ function SKOSEditor(options) {
 
                     //to add new rows
                     function createAdd() {
-                        var templ = add_template.clone();
+                        var templ = $(add_template);
                         templ.find(".add").click(function() {
                             var lang = language?("("+language+")"):"";
                             var inp = prompt("Set value for '"+title+"' "+lang, "");
@@ -1101,7 +1087,7 @@ function SKOSEditor(options) {
 
                     //if value is not set and not editable
                     function createEmpty() {
-                        var templ = literal_fix_template.clone();
+                        var templ = $(literal_fix_template);
                         templ.find(".literal_text").text("N/A");
                         table.append(templ);
                     }
@@ -1159,8 +1145,8 @@ function SKOSEditor(options) {
 
             //write editable row
             function writeEditable(table,data) {
-                var templ1 = literal_view_template.clone();
-                var templ2 = literal_edit_template.clone();
+                var templ1 = $(literal_view_template);
+                var templ2 = $(literal_edit_template);
                 templ2.find(".literal_input").val(data.value.value);
                 templ1.find(".literal_text").text(data.value.value);
                 templ1.find(".literal_text").click(function() {
@@ -1219,7 +1205,7 @@ function SKOSEditor(options) {
                         if(multivalue)createAdd();
                     } else {
                         for (var i = 0; i < data.length; i++) {
-                            var templ = literal_fix_template.clone();
+                            var templ = $(literal_fix_template);
                             templ.find(".literal_text").text(data[i].value.value);
                             table.append(templ);
                         }
@@ -1228,14 +1214,14 @@ function SKOSEditor(options) {
                     if(editable) {
                        createAdd();
                     } else {
-                        var templ = literal_fix_template.clone();
+                        var templ = $(literal_fix_template);
                         templ.find(".literal_text").text("N/A");
                         table.append(templ);
                     }
                 }
                 //to add new value
                 function createAdd() {
-                    var templ = add_template.clone();
+                    var templ = $(add_template);
                     templ.find(".add").click(function() {
                         var inp = prompt("Set value for '" + title + "'");
                         if (inp != null) {
@@ -1298,8 +1284,10 @@ function SKOSEditor(options) {
             function writeSingle(table,data) {
                 var title = data.title?data.title.value:data.uri.value;
                 if(editable) {
-                    var temp = concept_edit_template.clone();
-                    temp.find(".concept_text").text(title);
+                    var temp = $(concept_edit_template);
+                    temp.find(".concept_text").text(title).click(function() {
+                        events.fire(new Event(EventCode.CONCEPT.SELECTED,{uri:data.uri.value,type:'concept'},source));
+                    });
                     table.append(temp);
                     temp.find(".concept_delete").click(function(){
                          if(!confirm("delete relation")) return false;
@@ -1328,8 +1316,10 @@ function SKOSEditor(options) {
                          }
                     })
                 } else {
-                    var temp = concept_fix_template.clone();
-                    temp.find(".concept_text").text(title);
+                    var temp = $(concept_fix_template);
+                    temp.find(".concept_text").text(title).click(function() {
+                        events.fire(new Event(EventCode.CONCEPT.SELECT,current,source));
+                    });
                     table.append(temp);
                 }
             }
@@ -1447,33 +1437,31 @@ function SKOSEditor(options) {
 
         function Alert(title,message,action) {
             $("#"+background).show();
-            $("#" + container).load("html/popups/alert.html", function() {
-                $("#popup_title").text(title);
-                $("#popup_message").html(message);
-                $("#popup_close").click(function() {
-                    close();
-                    if(action)action();
-                });
-                $("#popup_cancel").click(function() {
-                    close();
-                    if(action)action();
-                });
+            $("#" + container).html(HTML_TEMPLATES.popups.alert);
+            $("#popup_title").text(title);
+            $("#popup_message").html(message);
+            $("#popup_close").click(function() {
+                close();
+                if (action)action();
+            });
+            $("#popup_cancel").click(function() {
+                close();
+                if (action)action();
             });
         }
 
         function Info(title,message,action) {
             $("#"+background).show();
-            $("#" + container).load("html/popups/info.html", function() {
-                $("#popup_title").text(title);
-                $("#popup_message").html(message);
-                $("#popup_close").click(function() {
-                    close();
-                    if(action)action();
-                });
-                $("#popup_cancel").click(function() {
-                    close();
-                    if(action)action();
-                });
+            $("#" + container).html(HTML_TEMPLATES.popups.info);
+            $("#popup_title").text(title);
+            $("#popup_message").html(message);
+            $("#popup_close").click(function() {
+                close();
+                if (action)action();
+            });
+            $("#popup_cancel").click(function() {
+                close();
+                if (action)action();
             });
         }
 
@@ -1483,24 +1471,29 @@ function SKOSEditor(options) {
          */
         function CreateConceptPopup(data) {
             $("#"+background).show();
-            $("#" + container).load("html/popups/concept_creator.html", function() {
-                $("#popup_title").text("Create "+getType(data.type));
-                $("#popup_close").click(function() {
-                    close();
-                });
-                $("#popup_create").click(function() {
-                    if ($("#popup_input").val() == "") {
-                        popups.info("Info","name is mandatory");
-                    } else {
-                        var uri = OPTIONS.BASE_URI + String.random(8);
-                        var title = $("#popup_input").val();
-                        switch(data.type) {
-                            case 'graph':createScheme(uri,title);break;
-                            case 'scheme':createTopConcept(data.uri,uri,title);break;
-                            default:createConcept(data.uri,uri,title);break;
-                        }
+            $("#" + container).html(HTML_TEMPLATES.popups.concept);
+            $("#popup_title").text("Create " + getType(data.type));
+            $("#popup_close").click(function() {
+                close();
+            });
+            $("#popup_create").click(function() {
+                if ($("#popup_input").val() == "") {
+                    popups.info("Info", "name is mandatory");
+                } else {
+                    var uri = OPTIONS.BASE_URI + String.random(8);
+                    var title = $("#popup_input").val();
+                    switch (data.type) {
+                        case 'graph':
+                            createScheme(uri, title);
+                            break;
+                        case 'scheme':
+                            createTopConcept(data.uri, uri, title);
+                            break;
+                        default:
+                            createConcept(data.uri, uri, title);
+                            break;
                     }
-                });
+                }
             });
             function createScheme(uri,title) {
                 skos.create.scheme(graph,uri,title,function() {
@@ -1541,45 +1534,45 @@ function SKOSEditor(options) {
          */
         function SelectGraphPopup() {
             $("#"+background).show();
-            $("#" + container).load("html/popups/graph_selector.html", function() {
-                $("#popup_close").click(function() {
-                    close();
-                });
-                $("#popup_create").click(function() {
-                    if ($("#popup_input").val() == "") {
-                        popups.info("Info","name is mandatory");
-                    } else {
-                        var uri = OPTIONS.BASE_URI + String.random(8);
-                        var title = $("#popup_input").val();
-                        skos.create.graph(uri,title, function() {
-                            events.fire(new Event(EventCode.GRAPH.SELECTED,{uri:uri}));
-                            close();
-                        }, function() {
-                            popups.alert("Alert","could not create graph",close);
-                        });
-                    }
-                });
-                //list existing graphs
-                skos.list.graphs(function(data) {
-                    $("#popup_loading").hide();
-                    function appendItem(item) {
-                        var title = (item.title) ? item.title.value : item.uri.value;
-                        var button = $("<button></button>").text(title).click(function() {
-                            events.fire(new Event(EventCode.GRAPH.SELECTED,{uri:item.uri.value}));
-                            close();
-                        });
-                        $("#popup_list").append($("<li></li>").append(button));
-                    }
-                    for (var i = 0; i < data.length; i++) {
-                        appendItem(data[i]);
-                    }
-                    if(data.length == 0) {
-                        $("#popup_list").hide();
-                        $("#popup_empty_list").show();
-                    }
-                }, function() {
-                    popups.alert("Alert","could not list graphs",close);
-                });
+            $("#" + container).html(HTML_TEMPLATES.popups.graph);
+            $("#popup_close").click(function() {
+                close();
+            });
+            $("#popup_create").click(function() {
+                if ($("#popup_input").val() == "") {
+                    popups.info("Info", "name is mandatory");
+                } else {
+                    var uri = OPTIONS.BASE_URI + String.random(8);
+                    var title = $("#popup_input").val();
+                    skos.create.graph(uri, title, function() {
+                        events.fire(new Event(EventCode.GRAPH.SELECTED, {uri:uri}));
+                        close();
+                    }, function() {
+                        popups.alert("Alert", "could not create graph", close);
+                    });
+                }
+            });
+            //list existing graphs
+            skos.list.graphs(function(data) {
+                $("#popup_loading").hide();
+                function appendItem(item) {
+                    var title = (item.title) ? item.title.value : item.uri.value;
+                    var button = $("<button></button>").text(title).click(function() {
+                        events.fire(new Event(EventCode.GRAPH.SELECTED, {uri:item.uri.value}));
+                        close();
+                    });
+                    $("#popup_list").append($("<li></li>").append(button));
+                }
+
+                for (var i = 0; i < data.length; i++) {
+                    appendItem(data[i]);
+                }
+                if (data.length == 0) {
+                    $("#popup_list").hide();
+                    $("#popup_empty_list").show();
+                }
+            }, function() {
+                popups.alert("Alert", "could not list graphs", close);
             });
         }
 
@@ -1589,7 +1582,7 @@ function SKOSEditor(options) {
          */
         function SettingsPopup() {
             $("#"+background).show();
-            $("#" + container).load("html/popups/settings.html", function() {
+            $("#" + container).load("html/settings.html", function() {
                 $(".popup_cancel").click(function() {
                     close();
                 });
@@ -1612,92 +1605,69 @@ function SKOSEditor(options) {
      */
     function DragScroller() {
 
-        var speed = 15;
+        var speed = 50;
 
         var down;
         var up;
 
+        var active = false;
+        var direction = undefined;
+
         events.bind(EventCode.CONCEPT.DRAGSTART,function(e){
-            show();
+            add();
         });
         events.bind(EventCode.CONCEPT.DRAGEND,function(e){
-            hide();
+            active = false;
+            direction = undefined;
+            remove();
        });
 
-        function show() {
-            displayTop();
-            displayBottom();
-            $(window).bind('scroll.scroller',function(){ console.log("1");
-                //displayTop();
-                //displayBottom();
+        function add() {
+            //create
+            up = $("<div style='height:20px;width:100%;position:fixed;50%;z-index:1001;top:0;display:none'></div>").appendTo('body');
+            up.get(0).addEventListener('dragenter',function(){
+                active = true;
+                direction = 'top';
+                scroll();
             });
+            up.get(0).addEventListener('dragleave',function(){
+                active = false;
+                direction = undefined;
+            });
+            down = $("<div style='height:20px;width:100%;position:fixed;z-index:1001;bottom:0;display: none'></div>").appendTo('body');
+            down.get(0).addEventListener('dragenter',function(){
+                active = true;
+                direction = 'bottom';
+                scroll();
+            });
+            down.get(0).addEventListener('dragleave',function(){
+                active = false;
+                direction = undefined;
+            });
+            //display
+            if($(window).scrollTop()>0) up.show();
+            if($(document).height()>($(window).height()+$(window).scrollTop()+1)) down.show();
         }
 
-        function hide() {
-            if(down)down.remove();
-            if(up)up.remove();
-            $('window').unbind('.scroller');
-            down = undefined;
-            up = undefined;
+        function remove() {
+            down.remove();
+            up.remove();
         }
 
-        function displayTop() {
-            var timer;
-            if($(document).height()>$(window).height()) {
-                if($(window).scrollTop()>0 && !up) {
-                    up = $("<div style='height:20px;width:200px;background-color:red;position:fixed;left:50%;z-index:1001;top:0;margin-left:-100px;'></div>").appendTo('body');
-                    up.get(0).addEventListener('dragenter',function(){
-                        timer = setInterval(function(){
-                            if($(window).scrollTop()==0){
-                                clearInterval(timer);
-                                up.remove();
-                                up = undefined;
-                            } else {
-                                $(window).scrollTop(Math.min(0,$(window).scrollTop()-speed));
-                            }
-                        },100);
-                    })
-                    up.get(0).addEventListener('dragleave',function(){
-                        clearInterval(timer);
-                    })
-                } else {
-                    if(up) {
-                      up.remove();
-                      up = undefined;
-                    }
-                }
+        function scroll() {
+            if(!active) return;
+            if(direction=='top') {
+                $(window).scrollTop($(window).scrollTop()-speed);
+                if($(document).height()>($(window).height()+$(window).scrollTop())) down.show();
+                if($(window).scrollTop()==0) up.hide();
+                else setTimeout(scroll,50);
+            } else {
+                $(window).scrollTop($(window).scrollTop()+speed);
+                if($(window).scrollTop()>0) up.show();
+                if($(document).height()==($(window).height()+$(window).scrollTop()+1)) down.hide();
+                else setTimeout(scroll,50);
             }
         }
-
-        function displayBottom() {
-            var timer;
-            if($(document).height()>$(window).height()) {
-                if($(document).height()>($(window).height()+$(window).scrollTop())&&!down) {
-                    down = $("<div style='height:20px;width:200px;background-color:red;position:fixed;left:50%;z-index:1001;bottom:0;margin-left:-100px;'></div>").appendTo('body');
-                    down.get(0).addEventListener('dragenter',function(){
-                        timer = setInterval(function(){
-                            if($(document).height()==($(window).height()+$(window).scrollTop())){
-                                clearInterval(timer);
-                                down.remove();
-                                down = undefined;
-                            } else {
-                                $(window).scrollTop(Math.min($(document).height()-$(window).height(),$(window).scrollTop()+speed));
-                            }
-                        },50);
-                    });
-                    down.get(0).addEventListener('dragleave',function(){
-                        clearInterval(timer);
-                    });
-                } else {
-                    if(down) {
-                      down.remove();
-                      down = undefined;
-                    }
-                }
-            }
-        }
-
-        return {};
     }
 }
 

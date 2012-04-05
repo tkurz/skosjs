@@ -54,8 +54,7 @@ function SKOSClient(options) {
                 var query1 = "CREATE GRAPH<" + uri + ">";
                 if(OPTIONS.DEBUG)console.debug(query1);
                 sparqlClient.update(query1, function(){
-                    var language = OPTIONS.LANGUAGE=='none'?'':"@"+OPTIONS.LANGUAGE;
-                    var query2 = "INSERT DATA {GRAPH <" + uri + "> {<" + uri + "> <" + namespaces.DC + "title>\"" + title + "\"" + language + ";<"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project>;<"+ namespaces.DC_TERMS+"created>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>. }}";
+                    var query2 = "INSERT DATA {GRAPH <" + uri + "> {<" + uri + "> <" + namespaces.DC + "title>\"" + title + "\";<"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project>;<"+ namespaces.DC_TERMS+"created>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>. }}";
                     if(OPTIONS.DEBUG)console.debug(query2);
                     sparqlClient.update(query2, onsuccess, onfailure);
                 }, onfailure);
@@ -190,7 +189,7 @@ function SKOSClient(options) {
         related : function(graph,concept1,concept2,onsuccess, onfailure) {
             var datetime = currentDateTime();
             var query = "WITH <" + graph + "> DELETE {<" + concept1 + "> <" + namespaces.SKOS + "related> <" + concept2 + ">;<"+ namespaces.DC_TERMS+"modified>?x.<" + concept2 + "> <" + namespaces.SKOS + "topConceptOf> <" + concept1 + ">;<"+ namespaces.DC_TERMS+"modified>?y} INSERT {<" + concept1 + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.<" + concept2 + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
-            if(DEBUG)console.debug(query);
+            if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         }
     }
@@ -201,8 +200,9 @@ function SKOSClient(options) {
             sparqlClient.select(query, onsuccess, onfailure);
         },
         graph : function(graph,onsuccess, onfailure) {
-            var language = OPTIONS.LANGUAGE=='none'?"":OPTIONS.LANGUAGE;
-            var query = "SELECT DISTINCT ?title {GRAPH <"+graph+">{<"+graph+"> <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project>. Optional {<"+graph+"> <" + namespaces.DC + "title> ?title. FILTER (lang(?title) = '" + language + "')}}}";
+            var language = "";
+            //var query = "SELECT DISTINCT ?title {GRAPH <"+graph+">{<"+graph+"> <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project>. Optional {<"+graph+"> <" + namespaces.DC + "title> ?title. FILTER (lang(?title) = '" + language + "')}}}";
+            var query = "SELECT DISTINCT ?title WHERE { {GRAPH <"+graph+"> { <"+graph+"> <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project> }}UNION {GRAPH <"+graph+"> { ?a <"+ namespaces.RDF +"type><" + namespaces.SKOS + "Concept> }}OPTIONAL {<"+graph+"> <" + namespaces.DC + "title> ?title.FILTER (lang(?title) = '')}}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.select(query, onsuccess, onfailure)
         },
@@ -223,7 +223,8 @@ function SKOSClient(options) {
     this.list = {
         graphs : function(onsuccess, onfailure) {
             var language = OPTIONS.LANGUAGE=='none'?"":OPTIONS.LANGUAGE;
-            var query = "SELECT DISTINCT ?uri ?title {GRAPH ?uri{?uri <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project>. Optional {?uri <" + namespaces.DC + "title> ?title. FILTER (lang(?title) = '" + language + "')}}}";
+            //var query = "SELECT DISTINCT ?uri ?title {GRAPH ?uri{?uri <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project>. Optional {?uri <" + namespaces.DC + "title> ?title. FILTER (lang(?title) = '" + language + "')}}}";
+            var query = "SELECT DISTINCT ?uri ?title WHERE { {GRAPH ?uri { ?uri <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project> }}UNION {GRAPH ?uri { ?a <"+ namespaces.RDF +"type><" + namespaces.SKOS + "Concept> }}OPTIONAL {?uri <" + namespaces.DC + "title> ?title.FILTER (lang(?title) = '')}}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.select(query, onsuccess, onfailure);
         },
