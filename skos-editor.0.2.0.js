@@ -183,7 +183,7 @@ function SKOSEditor(options) {
             }
         },
         EventCode : EventCode,
-        init : function() {  alert(1);
+        init : function() {
             init();
         }
     }
