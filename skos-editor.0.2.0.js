@@ -146,13 +146,15 @@ function SKOSEditor(options) {
     var search = new Search('search');
     var dragscroller = new DragScroller();
 
-    //init views
-    menu.init();
-    tree.init();
-    resource.init();
-    popups.init();
+    function init() {
+        //init views
+        menu.init();
+        tree.init();
+        resource.init();
+        popups.init();
 
-    settings.init();
+        settings.init();
+    }
 
     //the return object for external interaction
     var return_object = {
@@ -180,7 +182,10 @@ function SKOSEditor(options) {
                 popups.alert(title,message);
             }
         },
-        EventCode : EventCode
+        EventCode : EventCode,
+        init : function() {  alert(1);
+            init();
+        }
     }
     return return_object;
 
@@ -376,24 +381,24 @@ function SKOSEditor(options) {
             events.fire(new Event(EventCode.CONCEPT.CREATE,current));
         });
 
-        self.createSeperator("Project");
+        //self.createSeperator("Project");
 
-        var settings = self.createMenuItem("Project","Graph Settings",function(){
+        /*var settings = self.createMenuItem("Project","Graph Settings",function(){
             if(settings.hasClass("disabled")) return false;
             events.fire(new Event(EventCode.SETTINGS.UPDATE,current));
-        });
+        });*/
 
         var about = self.createMenuItem("Help","About",function(){
             popups.info("About",HTML_TEMPLATES.about);
         });
 
         new_concept.addClass("disabled");
-        settings.addClass("disabled");
+        //settings.addClass("disabled");
 
         //bind events
         events.bind(EventCode.GRAPH.SELECTED,function(event){
             new_concept.removeClass("disabled");
-            settings.removeClass("disabled");
+            //settings.removeClass("disabled");
             current = {uri:event.data.uri,type:'graph'};
         });
         events.bind(EventCode.CONCEPT.SELECTED,function(event){
@@ -411,6 +416,7 @@ function SKOSEditor(options) {
 
         var graph;
         var tree;
+        var free;
         var current;
 
         //bind events
@@ -463,17 +469,17 @@ function SKOSEditor(options) {
         });
         events.bind(EventCode.RELATION.CREATED,function(event){
             switch(event.data.type) {
-                 case 'broader': reload(event.data.broader);break;
-                 case 'narrower': reload(event.data.broader);break;
-                 case 'broaderNarrower': reload(event.data.broader);break;
-                 case 'topConcept': reload(event.data.parent);break;
+                 case 'broader': reload(event.data.broader);loadFreeConcepts();break;
+                 case 'narrower': reload(event.data.broader);loadFreeConcepts();break;
+                 case 'broaderNarrower': reload(event.data.broader);loadFreeConcepts();break;
+                 case 'topConcept': reload(event.data.parent);loadFreeConcepts();break;
             }
         });
         events.bind(EventCode.RELATION.DELETED,function(event){
             switch(event.data.type) {
-                 case 'broader': reload(event.data.broader);break;
-                 case 'narrower': reload(event.data.broader);break;
-                 case 'topConcept': reload(event.data.parent);break;
+                 case 'broader': reload(event.data.broader);loadFreeConcepts();break;
+                 case 'narrower': reload(event.data.broader);loadFreeConcepts();break;
+                 case 'topConcept': reload(event.data.parent);loadFreeConcepts();break;
             }
         });
 
@@ -507,6 +513,7 @@ function SKOSEditor(options) {
 
         //load graph and schemes
         function load() {
+            //tree
             var _li = $("<li style='padding-left: 0'></li>").append("<a class='graph_leaf'>&nbsp;</a>").append($("<a></a>").text(graph.title).addClass('graph').attr("draggable",false).addClass("concept_"+graph.uri.md5()).addClass('node').click(function(){
                 $(".activeNode").removeClass('activeNode');
                 $(this).addClass('activeNode');
@@ -523,8 +530,31 @@ function SKOSEditor(options) {
                 $(".concept_"+current.uri.md5()).first().click();
             },function(){popups.alert("Alert","could not load schemes")})
             _li.append(_childs);
-            tree.empty().append(_li);
+            tree.empty().append(_li).append(initFreeConcepts());
+
             tree.children().last().addClass("last");
+        }
+
+        /**
+         * ATTENTION the skos query is very inefficient for bigger datsets
+         */
+        function initFreeConcepts() {
+            var _li = $("<li style='padding-left: 0'></li>").append("<a class='free_concept_leaf'>&nbsp;</a>").append($("<a></a>").text("Free Concepts").addClass('free').attr("draggable",false).addClass('node'));
+            free = $("<ul></ul>");
+            _li.append(free);
+            //load childs
+            loadFreeConcepts();
+            return _li;
+        }
+
+        function loadFreeConcepts() {
+            skos.list.freeConcepts(graph.uri,function(data){
+                free.empty();
+                for(var i=0; i<data.length;i++) {
+                    free.append(createNode(data[i],'concept'));
+                }
+                free.children().last().addClass("last");
+            },function(){popups.alert("Alert","could not load free concepts")});
         }
 
         //reload node
@@ -850,6 +880,9 @@ function SKOSEditor(options) {
             $("#view_header_rdf_link").click(function() {
                 OPTIONS.RDF_LINK(uri);
             });
+            $("#view_header_uri_delete").click(function(){
+                popups.info("Delete "+type,"Not yet implemented");
+            })
             switch (type) {
                 case 'graph':
                     createView(PROPERTIES.graph);
@@ -1381,7 +1414,7 @@ function SKOSEditor(options) {
                          } else if((property=="http://www.w3.org/2004/02/skos/core#hasTopConcept")) {
                               skos.set.topConcept(graph,current.uri,uri,function(){
                                   events.fire(new Event(EventCode.RELATION.CREATED,{type:"topConcept",parent:current.uri,child:uri},source));
-                             },function(){popups.alert("Alert","could not set relation");alert(2)});
+                             },function(){popups.alert("Alert","could not set relation");});
                          } else if((property=="http://www.w3.org/2004/02/skos/core#related")) {
                               skos.set.related(graph,current.uri,uri,function(){
                                   events.fire(new Event(EventCode.RELATION.CREATED,{type:"related",concept1:current.uri,concept2:uri},source));
@@ -1601,7 +1634,7 @@ function SKOSEditor(options) {
     }
 
     /**
-     * Shouls support drag scrolling
+     * Supports drag scrolling
      */
     function DragScroller() {
 

@@ -24,7 +24,7 @@ var HTML_TEMPLATES = {
                     '   #view_header_uri{color: gray;font-style: italic;padding-top:3px;}' +
                     '</style>' +
                     '<div class="view_header">' +
-                    '   <h1 class="header_uri"><span id="view_header_rdf_link" title="Open in Linked Data Browser">&nbsp;</span><span id="view_header_uri"></span></h1>' +
+                    '   <h1 class="header_uri"><span id="view_header_rdf_link" title="Open in Linked Data Browser">&nbsp;</span>&nbsp;<span id="view_header_uri"></span>&nbsp;<button class="button" id="view_header_uri_delete"><i class="icon-trash"></i></button></h1>' +
                     '</div>' +
                     '<div id="view_content" style="margin:10px 0 0">' +
                     '   <div style="float:left;width: 50%">' +

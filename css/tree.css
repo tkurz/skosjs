@@ -68,6 +68,7 @@ ul.tree [draggable] {
   user-select: none;
 }
 ul.tree a.graph{background-color: #001A66;}
+ul.tree a.free{background-color: #001A66;}
 ul.tree a.scheme{background-color: #260099;}
 ul.tree a.top-concept{background-color:#730099;}
 ul.tree a.concept{background-color: #990073;}

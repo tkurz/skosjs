@@ -47,9 +47,11 @@
         }
 
         $(document).ready(function(){
-            var edtior = new SKOSEditor(OPTIONS);
+            var editor = new SKOSEditor(OPTIONS);
             //importer
-            var ioservice = new IOService(edtior);
+            var ioservice = new IOService(editor);
+
+            editor.init();
         });
 
         function showRDF(uri){
