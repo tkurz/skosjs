@@ -167,6 +167,9 @@ function SKOSEditor(options) {
             }
         },
         event : {
+            fire : function(type,data,source) {
+                events.fire(new Event(type,data,source));
+            },
             bind : function(type,action) {
                 events.bind(type,action,arguments.callee.caller.toString().md5());
             },
@@ -1463,9 +1466,32 @@ function SKOSEditor(options) {
         this.info = function(title,message) {
             new Info(title,message);
         }
+        this.custom = function(title) {
+            return new CustomPopup(title);
+        }
 
         function Confirm() {
             //TODO
+        }
+
+        function CustomPopup(title) {
+
+            var self = this;
+
+            $("#popup").html(HTML_TEMPLATES.popups.custom);
+            $("#popup_title").text(title);
+            $("#popup_close").click(function(){
+                self.close();
+            })
+
+            this.open = function() {
+                $("#"+background).show();
+                $("#popup_custom").show();
+            }
+
+            this.setContent = function(jquery_obj) {
+                $("#popup_content").html(jquery_obj);
+            }
         }
 
         function Alert(title,message,action) {

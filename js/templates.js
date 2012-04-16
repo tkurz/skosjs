@@ -126,6 +126,15 @@ var HTML_TEMPLATES = {
         }
     },
     popups: {
+        "custom" :  '<style type="text/css">' +
+                        '   h1#popup_title {margin:0;padding:6px;background-color:#FFC414;color: black;font-size: 14px;border-bottom: 1px solid black;border-top: 1px solid #d3d3d3;border-right: 1px solid #d3d3d3;border-left: 1px solid #d3d3d3;}' +
+                        '</style>' +
+                        '<div id="popup_custom" style="width:500px;margin-left:-250px;top:100px;border:1px solid black;background-color:white;position:relative;display:none">' +
+                        '   <h1 id="popup_title"></h1>' +
+                        '   <span id="popup_close">&nbsp;</span>' +
+                        '   <div id="popup_content" style="text-align: center;padding:10px 0;">' +
+                        '   </div>' +
+                        '</div>',
         alert:  '<style type="text/css">' +
                 '   h1#popup_title {margin:0;font-size: 14px;border-bottom: 1px solid black;border-top: 1px solid #d3d3d3;border-right: 1px solid #d3d3d3;border-left: 1px solid #d3d3d3;}' +
                 '</style>' +
