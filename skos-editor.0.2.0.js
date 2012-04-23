@@ -523,25 +523,95 @@ function SKOSEditor(options) {
             bindShortcuts();
         }
 
+        //TODO fix
         function bindShortcuts() {
+
+            var timeout;
+            var item = undefined;
+
+            var loading = false;
+
             $(window).keypress(function(event) {
-                //TODO
+                if(event.target.id=="search_input") return false;
+                if($(".concept_"+current.uri.md5()).length==0) return false;
                 switch(event.keyCode) {
-                     //38 o 39 r 40 u
-                    case 38:
-                        if(event.target.id=="search_input") return false;
+                     //37 l 38 o 39 r 40 u 13 enter
+                    case 13:
+                        if(loading) return false;
                         event.preventDefault();
+                        if(!item) return false;
+                        item.children().eq(1).click();
+                        break;
+                    case 37:
+                        if(loading) return false;
+                        event.preventDefault();
+                        if(!item) setCurrent($(".concept_"+current.uri.md5()).parent());
+                        else {
+                            if(item.parent().hasClass('tree'))return false;
+                            if(timeout)clearTimeout(timeout);
+                            setCurrent(item.parent().parent());
+                        }
+                        break;
+                    case 38:
+                        if(loading) return false;
+                        event.preventDefault();
+                        if(!item) setCurrent($(".concept_"+current.uri.md5()).parent());
+                        else {
+                            if(timeout)clearTimeout(timeout);
+                            if(item.prev().length == 0) setCurrent(item.parent().children().last());
+                            else setCurrent(item.prev());
+                        }
                         break;
                     case 39:
-                        if(event.target.id=="search_input") return false;
+                        if(loading) return false;
                         event.preventDefault();
+                        if(!item) setCurrent($(".concept_"+current.uri.md5()).parent());
+                        else {
+                            if(item.parent().hasClass('tree')) {
+                               if(item.children().eq(2).children().length!=0){
+                                   setCurrent(item.children().eq(2).children().first());
+                               }
+                            } else if(item.children().eq(0).hasClass('plus')) {
+                                loading=true;
+                                var test = function() {
+                                    setTimeout(function(){
+                                        if(!item.children().eq(0).hasClass('minus')) {
+                                            test();
+                                        } else {
+                                           setCurrent(item.children().eq(2).children().first());
+                                           loading=false;
+                                        }
+                                    },200);
+                                }
+                                item.children().eq(0).click();
+                                test();
+                            } else if(item.children().eq(0).hasClass('minus')) {
+                                setCurrent(item.children().eq(2).children().first());
+                            }
+                        }
                         break;
                     case 40:
-                        if(event.target.id=="search_input") return false;
+                        if(loading) return false;
                         event.preventDefault();
+                        if(!item) setCurrent($(".concept_"+current.uri.md5()).parent());
+                        else {
+                            if(timeout)clearTimeout(timeout);
+                            if(item.next().length == 0) setCurrent(item.parent().children().first());
+                            else setCurrent(item.next());
+                        }
                         break;
                 }
             });
+
+            function setCurrent(li) {
+                item = li;
+                $(".navi").removeClass("navi");
+                li.addClass("navi");
+                timeout = setTimeout(function(){
+                    $(".navi").removeClass("navi");
+                    item = undefined;
+                },2000);
+            }
         }
 
         //re(load) graph

@@ -77,3 +77,7 @@ ul.tree a.activeNode {background-color:#FFC414 !important;color:black !important
 ul.tree a.dragover {
     border: 2px dotted #000;
 }
+
+ul.tree li.navi {
+    background: url("../img/arrow-left.png") no-repeat scroll right 7px transparent
+}
