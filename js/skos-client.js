@@ -43,6 +43,17 @@ function SKOSClient(options) {
             var query = "ASK { <"+uri+"> ?a ?b }";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.ask(query, onsuccess, onfailure);
+        },
+        graph : function(graph, onsuccess, onfailure) {
+            var query = "ASK { {GRAPH <"+graph+"> { <"+graph+"> <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project> }}UNION {GRAPH <"+graph+"> { ?a <"+ namespaces.RDF +"type><" + namespaces.SKOS + "Concept> }}}";
+            if(OPTIONS.DEBUG)console.debug(query);
+            sparqlClient.ask(query, function(data){
+                if(!data) {
+                    onfailure();
+                } else {
+                    onsuccess();
+                }
+            },onfailure);
         }
     }
 
@@ -75,7 +86,7 @@ function SKOSClient(options) {
                 if(data) {onfailure();return;}
                 var datetime = currentDateTime();
                 var language = OPTIONS.LANGUAGE=='none'?'':"@"+OPTIONS.LANGUAGE;
-                var query = "INSERT DATA {GRAPH <" + graph + "> {<" + uri + "> <" + namespaces.SKOS + "prefLabel>\"" + title + "\"" + language + ";<" + namespaces.RDF + "type><" + namespaces.SKOS + "Concept>;<"+ namespaces.DC_TERMS+"created>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.<" + concept + "><" + namespaces.SKOS + "hasTopConcept><" + uri + ">.<" + uri + "><" + namespaces.SKOS + "topConceptOf><" + concept + ">;<"+namespaces.SKOS+"inScheme><"+concept+">.}}";
+                var query = "INSERT DATA {GRAPH <" + graph + "> {<" + uri + "> <" + namespaces.SKOS + "prefLabel>\"" + title + "\"" + language + ";<" + namespaces.RDF + "type><" + namespaces.SKOS + "Concept>;<"+ namespaces.DC_TERMS+"created>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.<" + concept + "><" + namespaces.SKOS + "hasTopConcept><" + uri + ">.<" + uri + "><" + namespaces.SKOS + "topConceptOf><" + concept + ">.}}";
                 if(OPTIONS.DEBUG)console.log(query);
                 sparqlClient.update(query, onsuccess, onfailure);
             },onfailure);
@@ -85,7 +96,7 @@ function SKOSClient(options) {
                 if(data) {onfailure();return;}
                 var datetime = currentDateTime();
                 var language = OPTIONS.LANGUAGE=='none'?'':"@"+OPTIONS.LANGUAGE;
-                var query = "WITH <" + graph + "> INSERT {<" + uri + "> <" + namespaces.SKOS + "prefLabel>\"" + title + "\"" + language + ";<" + namespaces.RDF + "type><" + namespaces.SKOS + "Concept>;<"+ namespaces.DC_TERMS+"created>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>;<" + namespaces.SKOS + "broader><" + concept + ">;<"+namespaces.SKOS+"inScheme>?scheme.<" + concept + "><" + namespaces.SKOS + "narrower><" + uri + ">.} WHERE {<" + concept + "><" + namespaces.SKOS + "inScheme>?scheme.}";
+                var query = "WITH <" + graph + "> INSERT {<" + uri + "> <" + namespaces.SKOS + "prefLabel>\"" + title + "\"" + language + ";<" + namespaces.RDF + "type><" + namespaces.SKOS + "Concept>;<"+ namespaces.DC_TERMS+"created>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>;<" + namespaces.SKOS + "broader><" + concept + ">.<" + concept + "><" + namespaces.SKOS + "narrower><" + uri + ">.} WHERE {}";
                 if(OPTIONS.DEBUG)console.log(query);
                 sparqlClient.update(query, onsuccess, onfailure);
             },onfailure);
@@ -191,6 +202,16 @@ function SKOSClient(options) {
             var query = "WITH <" + graph + "> DELETE {<" + concept1 + "> <" + namespaces.SKOS + "related> <" + concept2 + ">;<"+ namespaces.DC_TERMS+"modified>[].<" + concept2 + "> <" + namespaces.SKOS + "topConceptOf> <" + concept1 + ">;<"+ namespaces.DC_TERMS+"modified>[]} INSERT {<" + concept1 + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.<" + concept2 + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
+        },
+        concept : function(graph,uri,onsuccess, onfailure) {
+            var query = "WITH <" + graph + "> DELETE {<"+uri+">?x?z.?a?b<"+uri+">} WHERE {}";
+            if(OPTIONS.DEBUG)console.debug(query);
+            sparqlClient.update(query, onsuccess, onfailure);
+        },
+        skosRelations : function(graph,uri,onsuccess, onfailure) {
+            var query = "WITH <" + graph + "> DELETE {<"+uri+"><" + namespaces.SKOS + "broader>?z.?a<" + namespaces.SKOS + "narrower><"+uri+">.<"+uri+"><" + namespaces.SKOS + "narrower>?r.?q<" + namespaces.SKOS + "broader><"+uri+">.<"+uri+"><" + namespaces.SKOS + "topConceptOf>?z.?a<" + namespaces.SKOS + "hasTopConcept><"+uri+">} WHERE {}";
+            if(OPTIONS.DEBUG)console.debug(query);
+            sparqlClient.update(query, onsuccess, onfailure);
         }
     }
     this.get = {
@@ -201,10 +222,10 @@ function SKOSClient(options) {
         },
         graph : function(graph,onsuccess, onfailure) {
             var language = "";
-            //var query = "SELECT DISTINCT ?title {GRAPH <"+graph+">{<"+graph+"> <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project>. Optional {<"+graph+"> <" + namespaces.DC + "title> ?title. FILTER (lang(?title) = '" + language + "')}}}";
-            var query = "SELECT DISTINCT ?title WHERE { {GRAPH <"+graph+"> { <"+graph+"> <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project> }}UNION {GRAPH <"+graph+"> { ?a <"+ namespaces.RDF +"type><" + namespaces.SKOS + "Concept> }}OPTIONAL {<"+graph+"> <" + namespaces.DC + "title> ?title.FILTER (lang(?title) = '')}}";
+
+            var query = "SELECT DISTINCT ?title WHERE { {GRAPH <"+graph+"> { <"+graph+"> <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project> }}UNION {GRAPH <"+graph+"> { ?a <"+ namespaces.RDF +"type><" + namespaces.SKOS + "Concept> }}OPTIONAL {<"+graph+"> <" + namespaces.DC + "title> ?title.FILTER (lang(?title) = '" + language + "')}}";
             if(OPTIONS.DEBUG)console.debug(query);
-            sparqlClient.select(query, onsuccess, onfailure)
+            sparqlClient.select(query, onsuccess, onfailure);
         },
         scheme : function(graph,uri,onsuccess, onfailure) {
             var language = OPTIONS.LANGUAGE=='none'?"":OPTIONS.LANGUAGE;

@@ -18,10 +18,10 @@ function SKOSEditor(options) {
     var OPTIONS = {
         RDF_LINK : function(uri){window.open(uri)},
         BASE_URI : "http://localhost:8080/LMF/resource/",
-        LANGUAGES_SUPPORTED : ["en","de"],
+        LANGUAGES_SUPPORTED : ["de","it"],
         ENDPOINT_SELECT : "http://localhost:8080/LMF/sparql/select",
         ENDPOINT_UPDATE : "http://localhost:8080/LMF/sparql/update",
-        LANGUAGE : "en-gb",
+        LANGUAGE : "de",
         DEBUG : false,
         COOKIES_ENABLED : true,
         COOKIE_EXPIRE_DAYS : 7
@@ -183,6 +183,9 @@ function SKOSEditor(options) {
             },
             alert : function(title,message) {
                 popups.alert(title,message);
+            },
+            custom : function(title) {
+                return popups.custom(title);
             }
         },
         EventCode : EventCode,
@@ -285,7 +288,10 @@ function SKOSEditor(options) {
                 if(data[0]&&data[0].title)title=data[0].title.value;
                 events.fire(new Event(EventCode.GRAPH.LOAD,{uri:graph,title:title},self));
                 if(OPTIONS.COOKIES_ENABLED) setCookie("graph",graph);
-            },function(){popups.alert("Error","Could not load graph")})
+            },function(){
+                popups.alert("Error","Could not load graph");
+                if(OPTIONS.COOKIES_ENABLED) resetCookie("graph");
+            })
         }
 
         this.reset = function() {
@@ -297,11 +303,12 @@ function SKOSEditor(options) {
             if(OPTIONS.COOKIES_ENABLED) {
                 var uri = getCookie("graph");
                 if(uri){
-                    //check if graph exists TODO
-                    events.fire(new Event(EventCode.GRAPH.SELECTED,{uri:uri}));
-                    //else
-                    //if(OPTIONS.COOKIES_ENABLED) resetCookie("graph");
-                    //popups.alert("Error","Could not load graph")
+                    skos.exists.graph(uri,function(){
+                        events.fire(new Event(EventCode.GRAPH.SELECTED,{uri:uri}));
+                    },function(){
+                        popups.alert("Error","Could not load graph");
+                        if(OPTIONS.COOKIES_ENABLED) resetCookie("graph");
+                    })
                 }
             }
         }
@@ -340,7 +347,7 @@ function SKOSEditor(options) {
         var menu = $("<ul></ul>").addClass("menu").appendTo("#"+container_id);
 
         this.init = function() {
-            //not in use
+            setShortcuts()
         }
         /**
          * creates a submenu point (subname) on given menu point (name) triggering action.
@@ -348,7 +355,7 @@ function SKOSEditor(options) {
          * @param subname
          * @param action
          */
-        this.createMenuItem = function(name,subname,action) {
+        this.createMenuItem = function(name,subname,action,shortcut) {
             if(!menu_items[name]) {
                 menu_items[name] = $("<li></li>").html("<a>"+name+"</a><ul></ul>").appendTo(menu);
                 menu_items[name].hover(function(){
@@ -359,7 +366,8 @@ function SKOSEditor(options) {
                     $('ul:first',menu_items[name]).css('visibility', 'hidden');
                 });
             }
-            var menu_point = $("<li></li>").append($("<a></a>").text(subname).click(function(){
+            var shortcut=shortcut?"<span class='menu_shortcut'>"+shortcut+"</span>":"";
+            var menu_point = $("<li></li>").append($("<a></a>").html(subname+shortcut).click(function(){
                 if(menu_point.hasClass("disabled")) return false;
                 action();
             })).appendTo(menu_items[name].find("ul"));
@@ -378,11 +386,11 @@ function SKOSEditor(options) {
         var open_new_graph = self.createMenuItem("Project","Open/Create Graph",function(){
             if(open_new_graph.hasClass("disabled")) return false;
             events.fire(new Event(EventCode.GRAPH.CREATE));
-        });
+        },"CTRL+g");
         var new_concept = self.createMenuItem("Project","Create Scheme/Concept",function(){
             if(new_concept.hasClass("disabled")) return false;
             events.fire(new Event(EventCode.CONCEPT.CREATE,current));
-        });
+        },"CTRL+n");
 
         //self.createSeperator("Project");
 
@@ -407,6 +415,28 @@ function SKOSEditor(options) {
         events.bind(EventCode.CONCEPT.SELECTED,function(event){
             current = {uri:event.data.uri,type:event.data.type};
         });
+
+        function setShortcuts() {
+            $(window).keypress(function(event) {
+                if(event.ctrlKey) {
+                    switch(event.which) {
+                        case 103://G
+                            events.fire(new Event(EventCode.GRAPH.CREATE));
+                            event.preventDefault();
+                            break;
+                        case 110://N
+                            if(!new_concept.hasClass("disabled"))events.fire(new Event(EventCode.CONCEPT.CREATE,current));
+                            event.preventDefault();
+                            break;
+                        /*case 115://S
+                            events.fire(new Event(EventCode.GRAPH.CREATE));
+                            event.preventDefault();
+                            break;
+                            */
+                    }
+                }
+            });
+        }
 
     }
 
@@ -490,6 +520,28 @@ function SKOSEditor(options) {
         this.init = function() {
             tree = $("<ul></ul>").addClass("tree");
             $("#"+container).empty().append(tree);
+            bindShortcuts();
+        }
+
+        function bindShortcuts() {
+            $(window).keypress(function(event) {
+                //TODO
+                switch(event.keyCode) {
+                     //38 o 39 r 40 u
+                    case 38:
+                        if(event.target.id=="search_input") return false;
+                        event.preventDefault();
+                        break;
+                    case 39:
+                        if(event.target.id=="search_input") return false;
+                        event.preventDefault();
+                        break;
+                    case 40:
+                        if(event.target.id=="search_input") return false;
+                        event.preventDefault();
+                        break;
+                }
+            });
         }
 
         //re(load) graph
@@ -568,7 +620,7 @@ function SKOSEditor(options) {
                 if(type=="scheme") {
                     skos.get.scheme(graph.uri,uri,function(data){rewrite(data,type,container)},function(){popups.alert("Alert","could not reload scheme")});
                 } else {
-                    skos.get.concept(graph.uri,uri,function(data){rewrite(data,type,container)},function(){popups.alert("Alert","could not reload scheme")});
+                    skos.get.concept(graph.uri,uri,function(data){rewrite(data,type,container)},function(){popups.alert("Alert","could not reload concept")});
                 }
             });
             function rewrite(data,type,container) {
@@ -590,7 +642,7 @@ function SKOSEditor(options) {
             var _more = $("<a>&nbsp;</a>");
             var _span =  $("<a></a>").text(_title).addClass(type).attr('type',type).addClass("concept_"+data.uri.value.md5()).addClass('node').click(function(){
                 $(".activeNode").removeClass('activeNode');
-                $('.concept_'+data.uri.value.md5()).addClass('activeNode');
+                $('.concept_'+data.uri.value.md5()).addClass('activeNode').focus();
                 select(data.uri.value,type);
             });
 
@@ -728,6 +780,19 @@ function SKOSEditor(options) {
             suggestions.hide();
         });
 
+        function setShortcuts() {
+            $(window).keypress(function(event) {
+                if(event.ctrlKey) {
+                    switch(event.which) {
+                        case 102://F
+                            input_field.val("").focus();
+                            break;
+                    }
+                }
+            });
+        }
+        setShortcuts();
+
         //react on keypress
         input_field.keyup(function(e) {
             if (graph == null) {
@@ -741,6 +806,7 @@ function SKOSEditor(options) {
                     if (selected) {
                         events.fire(new Event(EventCode.CONCEPT.SELECTED, selected, source));
                         suggestions.hide();
+                        input_field.focusout();
                     } else popups.info("Info", "no results");
                     return;
                 }
@@ -884,7 +950,7 @@ function SKOSEditor(options) {
                 OPTIONS.RDF_LINK(uri);
             });
             $("#view_header_uri_delete").click(function(){
-                popups.info("Delete "+type,"Not yet implemented");
+                events.fire(new Event(EventCode.CONCEPT.DELETE,current,self));
             })
             switch (type) {
                 case 'graph':
@@ -1444,6 +1510,7 @@ function SKOSEditor(options) {
      */
     function Popups(container,background) {
         var graph;
+        var self = this;
         //bind events
         events.bind(EventCode.GRAPH.CREATE,function(){
             new SelectGraphPopup();
@@ -1456,7 +1523,56 @@ function SKOSEditor(options) {
         })
         events.bind(EventCode.GRAPH.SELECTED,function(e){
             graph=e.data.uri;
-        })
+        });
+        events.bind(EventCode.CONCEPT.DELETE,function(event){
+            var deleteGraph = function() {
+                alert("Not implemented yet");close();
+            }
+
+            var deleteSchemeAll = function() {
+                 alert("Not implemented yet");close();
+            }
+
+            var deleteSchemeOnly = function() {
+                 skos._delete.concept(graph,event.data.uri,function(){
+                     events.fire(new Event(EventCode.GRAPH.SELECTED,{uri:graph},self));
+                     close();
+                 },function(){popups.alert("Alert","Could not delete scheme!")});
+            }
+
+            var deleteConceptAll = function() {
+                skos._delete.concept(graph,event.data.uri,function(){
+                     events.fire(new Event(EventCode.GRAPH.SELECTED,{uri:graph},self));
+                     close();
+                 },function(){popups.alert("Alert","Could not delete scheme!")});
+            }
+
+            var deleteConceptRelations = function() {
+                skos._delete.skosRelations(graph,event.data.uri,function(){
+                     events.fire(new Event(EventCode.GRAPH.SELECTED,{uri:graph},self));
+                     close();
+                 },function(){popups.alert("Alert","Could not delete scheme!")});
+            }
+
+            switch(event.data.type) {
+                case 'graph':
+                    new Confirm("Delete Graph","Deleting graph will delete all underlying schemes and concepts!",
+                        [{"title":"Delete Graph","action":deleteGraph}]
+                    );break;
+                case 'scheme':
+                    new Confirm("Delete Scheme","Delete scheme and all concepts or delete the scheme only?",
+                        [{"title":"Delete all","action":deleteSchemeAll},{"title":"Delete scheme only","action":deleteSchemeOnly}]
+                    );break;
+                default:
+                    new Confirm("Delete Concept","Delete concept with all properties or just remove concept from SKOS Tree?",
+                        [{"title":"Delete Concept","action":deleteConceptAll},{"title":"Remove Concept","action":deleteConceptRelations}]
+                    );
+            };
+
+            function reload() {
+
+            }
+        });
         this.init = function() {
 
         }
@@ -1470,8 +1586,31 @@ function SKOSEditor(options) {
             return new CustomPopup(title);
         }
 
-        function Confirm() {
-            //TODO
+        //func is an array of objects {title:t,action:f}
+        function Confirm(title,message,func) {
+            $("#"+background).show();
+            $("#" + container).html(HTML_TEMPLATES.popups.confirm);
+            $("#popup_title").text(title);
+            $("#popup_message").html(message);
+            $("#popup_close").click(function() {
+                close();
+            });
+            $("#popup_cancel").click(function() {
+                close();
+            });
+            var buttons = $("#popup_button_list");
+            for(var i in func) {
+                var b = buildButton(func[i]);
+                b.appendTo(buttons);
+            }
+            $("#popup_cancel").focus();
+
+            function buildButton(func) {
+                var b = $("<button></button>").text(func.title).click(function(){
+                    func.action();
+                });
+                return b;
+            }
         }
 
         function CustomPopup(title) {
@@ -1492,6 +1631,10 @@ function SKOSEditor(options) {
             this.setContent = function(jquery_obj) {
                 $("#popup_content").html(jquery_obj);
             }
+
+            this.close = function() {
+                close();
+            }
         }
 
         function Alert(title,message,action) {
@@ -1507,6 +1650,7 @@ function SKOSEditor(options) {
                 close();
                 if (action)action();
             });
+            $("#popup_cancel").focus();
         }
 
         function Info(title,message,action) {
@@ -1522,6 +1666,7 @@ function SKOSEditor(options) {
                 close();
                 if (action)action();
             });
+            $("#popup_cancel").focus();
         }
 
         /**
@@ -1554,6 +1699,15 @@ function SKOSEditor(options) {
                     }
                 }
             });
+
+            $("#popup_input").focus();
+            $('#popup_input').keypress(function(e){
+                if(e.which == 13){
+                    $("#popup_create").click();
+                }
+            });
+
+
             function createScheme(uri,title) {
                 skos.create.scheme(graph,uri,title,function() {
                     events.fire(new Event(EventCode.SCHEME.CREATED, {parent:parent,uri:uri,type:'scheme'}));
@@ -1611,6 +1765,14 @@ function SKOSEditor(options) {
                     });
                 }
             });
+
+            $("#popup_input").focus();
+            $('#popup_input').keypress(function(e){
+                if(e.which == 13){
+                    $("#popup_create").click();
+                }
+            });
+
             //list existing graphs
             skos.list.graphs(function(data) {
                 $("#popup_loading").hide();

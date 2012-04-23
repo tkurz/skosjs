@@ -31,7 +31,7 @@
     <script type="text/javascript" src="js/md5.js"></script>
     <script type="text/javascript" src="js/sparql-client.js"></script>
     <script type="text/javascript" src="js/skos-client.js"></script>
-    <script type="text/javascript" src="js/lmf/ioservice.js"></script>
+    <script type="text/javascript" src="extension/lmf/ioservice.js"></script>
     <script type="text/javascript" src="js/templates.js"></script>
     <script type="text/javascript" src="skos-editor.0.2.0.js"></script>
     <script type="text/javascript">
@@ -49,7 +49,7 @@
         $(document).ready(function(){
             var editor = new SKOSEditor(OPTIONS);
             //importer
-            var ioservice = new IOService(editor);
+            var ioservice = new IOService(editor,"http://labs.newmedialab.at/SKOS/");
 
             editor.init();
         });

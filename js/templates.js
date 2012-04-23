@@ -189,12 +189,25 @@ var HTML_TEMPLATES = {
                 '   h1#popup_title {margin:0;font-size: 14px;border-bottom: 1px solid black;border-top: 1px solid #d3d3d3;border-right: 1px solid #d3d3d3;border-left: 1px solid #d3d3d3;}' +
                 '</style>' +
                 '<div style="width:300px;margin-left:-150px;top:100px;border:1px solid black;background-color:white;position:relative">' +
-                '   <h1 id="popup_title" class="info_title">Create Concept</h1>' +
+                '   <h1 id="popup_title" class="info_title">Info</h1>' +
                 '   <span id="popup_close">&nbsp;</span>' +
                 '   <div style="text-align: center;padding:10px 0;">' +
                 '       <div style="margin-right: 10px;font-size: 12px" id="popup_message"></div>' +
                 '       <div style="margin-top:10px;width: 100%;">' +
                 '           <button id="popup_cancel">OK</button>' +
+                '       </div>' +
+                '   </div>' +
+                '</div>',
+        confirm:   '<style type="text/css">' +
+                '   h1#popup_title {margin:0;font-size: 14px;border-bottom: 1px solid black;border-top: 1px solid #d3d3d3;border-right: 1px solid #d3d3d3;border-left: 1px solid #d3d3d3;}' +
+                '</style>' +
+                '<div style="width:300px;margin-left:-150px;top:100px;border:1px solid black;background-color:white;position:relative">' +
+                '   <h1 id="popup_title" class="confirm_title">Choice</h1>' +
+                '   <span id="popup_close">&nbsp;</span>' +
+                '   <div style="text-align: center;padding:10px 0;">' +
+                '       <div style="margin: 10px;font-size: 12px" id="popup_message"></div>' +
+                '       <div id="popup_button_list" style="margin-top:10px;width: 100%;">' +
+                '           <button id="popup_cancel">Cancel</button>' +
                 '       </div>' +
                 '   </div>' +
                 '</div>',

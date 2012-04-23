@@ -80,3 +80,7 @@ ul.menu hr.seperator {
     height: 2px;
     margin:0;
 }
+
+span.menu_shortcut {
+    font-size:10px;padding-left:10px;color:#001A66;
+}
