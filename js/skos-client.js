@@ -36,6 +36,10 @@ function SKOSClient(options) {
         SKOSJS : "http://tkurz.github.com/skosjs/ns/2012/03/"
     }
 
+    this.setLanguage = function(lang) {
+        OPTIONS.LANGUAGE = lang;
+    }
+
     var sparqlClient = new SparqlClient(OPTIONS.ENDPOINT_SELECT,OPTIONS.ENDPOINT_UPDATE);
 
     this.exists = {
@@ -107,7 +111,7 @@ function SKOSClient(options) {
         value : function(graph, uri, property, value, language, onsuccess, onfailure) {
             var datetime = currentDateTime();
             language = language&&language!='none'?"@"+language:"";
-            var query = "WITH <" + graph + "> DELETE {<" + uri + "><"+ namespaces.DC_TERMS+"modified>[]} INSERT {<" + uri + "> <" + property + ">\"" + value + "\"" + language + ";<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
+            var query = "WITH <" + graph + "> DELETE {<" + uri + "><"+ namespaces.DC_TERMS+"modified>[]} INSERT DATA{<" + uri + "> <" + property + ">\"" + value + "\"" + language + ";<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         },
@@ -150,6 +154,20 @@ function SKOSClient(options) {
         related : function(graph,concept1,concept2, onsuccess, onfailure) {
             var datetime = currentDateTime();
             var query = "WITH <" + graph + "> DELETE {<" + concept1 + "><"+ namespaces.DC_TERMS+"modified>[].<" + concept2 + "><"+ namespaces.DC_TERMS+"modified>[]} INSERT {<" + concept1 + "> <" + namespaces.SKOS + "related> <" + concept2 + ">;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.<" + concept2 + "> <" + namespaces.SKOS + "related> <" + concept1 + ">;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
+            if(OPTIONS.DEBUG)console.debug(query);
+            sparqlClient.update(query, onsuccess, onfailure);
+        },
+        graphLanguages : function(graph,languages,onsuccess, onfailure) {
+            var data = "";
+            for(var i in languages) {
+                data += "<"+graph+"><"+namespaces.SKOSJS+"hasLanguage>\""+languages[i]+"\".";
+            }
+            var query = "WITH <" + graph + "> DELETE {<"+graph+"><"+namespaces.SKOSJS+"hasLanguage>[]}INSERT {"+data+"} WHERE {}";
+            if(OPTIONS.DEBUG)console.debug(query);
+            sparqlClient.update(query, onsuccess, onfailure);
+        },
+        graphFirstLanguage : function(graph,language,onsuccess, onfailure) {
+            var query = "WITH <" + graph + "> DELETE {<"+graph+"><"+namespaces.SKOSJS+"hasFirstLanguage>[]}INSERT {<"+graph+"><"+namespaces.SKOSJS+"hasFirstLanguage>\""+language+"\".} WHERE {}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         }
@@ -238,6 +256,11 @@ function SKOSClient(options) {
             var query = "SELECT DISTINCT ?title ?children {GRAPH <" + graph + "> {OPTIONAL { <"+uri+"> <" + namespaces.SKOS + "prefLabel> ?title . FILTER (lang(?title) = '" + language + "') }BIND ( EXISTS { <"+uri+">  <" + namespaces.SKOS + "narrower> [] } AS ?children )}}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.select(query, onsuccess, onfailure)
+        },
+        graphFirstLanguage : function(graph,onsuccess, onfailure) {
+            var query = "SELECT ?language WHERE {GRAPH <"+graph+">{<"+graph+"> <"+namespaces.SKOSJS+"hasFirstLanguage> ?language}}";
+            if(OPTIONS.DEBUG)console.debug(query);
+            sparqlClient.select(query, onsuccess, onfailure);
         }
     }
 
@@ -281,6 +304,11 @@ function SKOSClient(options) {
         freeConcepts : function(graph,onsuccess, onfailure) {
             var language = OPTIONS.LANGUAGE=='none'?"":OPTIONS.LANGUAGE;
             var query = "SELECT ?uri ?title ?children WHERE {GRAPH <"+graph+"> {?uri <"+namespaces.RDF+"type> <"+namespaces.SKOS+"Concept>. FILTER NOT EXISTS {[] <"+namespaces.SKOS+"narrower> ?uri}. FILTER NOT EXISTS {[] <"+namespaces.SKOS+"hasTopConcept> ?uri}.OPTIONAL{ ?uri <"+namespaces.SKOS+"prefLabel> ?title.FILTER(lang(?title)='"+language+"')}BIND(EXISTS {?uri <"+namespaces.SKOS+"narrower> []} AS ?children)}}"
+            if(OPTIONS.DEBUG)console.debug(query);
+            sparqlClient.select(query, onsuccess, onfailure);
+        },
+        graphLanguages : function(graph,onsuccess, onfailure) {
+            var query = "SELECT ?language WHERE {GRAPH <"+graph+">{<"+graph+"> <"+namespaces.SKOSJS+"hasLanguage> ?language}}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.select(query, onsuccess, onfailure);
         }

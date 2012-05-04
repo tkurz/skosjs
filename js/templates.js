@@ -172,7 +172,7 @@ var HTML_TEMPLATES = {
                 '   <h1>Select / Create Graph</h1>' +
                 '   <span id="popup_close">&nbsp;</span>' +
                 '   <h2>Select existing Graph:</h2>' +
-                '   <div style="width: 100%;padding: 5px;max-height:200px;overflow-y:auto;text-align: center">' +
+                '   <div style="width:480px;padding: 5px;max-height:200px;overflow-y:auto;text-align: center">' +
                 '       <span id="popup_loading">&nbsp;</span>' +
                 '       <ul id="popup_list" class="project_list"></ul>' +
                 '       <span id="popup_empty_list" style="display:none;font-size: 12px;">No existing Graphs</span>' +

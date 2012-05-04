@@ -282,16 +282,27 @@ function SKOSEditor(options) {
 
         function loadGraph(uri) {
             graph = uri;
-            //load settings !! TODO
-            skos.get.graph(graph,function(data){
-                var title = graph;
-                if(data[0]&&data[0].title)title=data[0].title.value;
-                events.fire(new Event(EventCode.GRAPH.LOAD,{uri:graph,title:title},self));
-                if(OPTIONS.COOKIES_ENABLED) setCookie("graph",graph);
-            },function(){
-                popups.alert("Error","Could not load graph");
-                if(OPTIONS.COOKIES_ENABLED) resetCookie("graph");
-            })
+            skos.get.graphFirstLanguage(graph,function(data){
+                if(data[0]&&data[0].language)language=data[0].language.value;
+                skos.list.graphLanguages(graph,function(data){
+                    var lngs = [];
+                    lngs.push(language);
+                    for(var i in data) {
+                        if(data[i].language.value!=language)lngs.push(data[i].language.value);
+                    }
+                    if(data.length>0)languages = lngs;
+                    if(skos)skos.setLanguage(language);
+                    skos.get.graph(graph,function(data){
+                        var title = graph;
+                        if(data[0]&&data[0].title)title=data[0].title.value;
+                            events.fire(new Event(EventCode.GRAPH.LOAD,{uri:graph,title:title},self));
+                        if(OPTIONS.COOKIES_ENABLED) setCookie("graph",graph);
+                    },function(){
+                        popups.alert("Error","Could not load graph");
+                        if(OPTIONS.COOKIES_ENABLED) resetCookie("graph");
+                    })
+                },function(){alert("could not read languages")})
+            },function(){alert("could not read first language")});
         }
 
         this.reset = function() {
@@ -312,13 +323,19 @@ function SKOSEditor(options) {
                 }
             }
         }
-
+        /*
         this.set = function(settings) {
             //TODO
             events.fire(new Event(EventCode.SETTINGS.UPDATED));
-        }
+        } */
         this.getLanguage = function(){return language};
         this.getLanguages = function(){return languages};
+        this.setLanguage = function(l){
+            language = l;
+        }
+        this.setLanguages = function(l){
+            languages = l;
+        }
         this.getGraph = function(){return graph};
 
         events.bind(EventCode.GRAPH.SELECTED,function(event){
@@ -392,24 +409,24 @@ function SKOSEditor(options) {
             events.fire(new Event(EventCode.CONCEPT.CREATE,current));
         },"CTRL+n");
 
-        //self.createSeperator("Project");
+        self.createSeperator("Project");
 
-        /*var settings = self.createMenuItem("Project","Graph Settings",function(){
+        var settings = self.createMenuItem("Project","Graph Settings",function(){
             if(settings.hasClass("disabled")) return false;
             events.fire(new Event(EventCode.SETTINGS.UPDATE,current));
-        });*/
+        });
 
         var about = self.createMenuItem("Help","About",function(){
             popups.info("About",HTML_TEMPLATES.about);
         });
 
         new_concept.addClass("disabled");
-        //settings.addClass("disabled");
+        settings.addClass("disabled");
 
         //bind events
         events.bind(EventCode.GRAPH.SELECTED,function(event){
             new_concept.removeClass("disabled");
-            //settings.removeClass("disabled");
+            settings.removeClass("disabled");
             current = {uri:event.data.uri,type:'graph'};
         });
         events.bind(EventCode.CONCEPT.SELECTED,function(event){
@@ -532,8 +549,7 @@ function SKOSEditor(options) {
             var loading = false;
 
             $(window).keypress(function(event) {
-                if(event.target.id=="search_input") return false;
-                if($(".concept_"+current.uri.md5()).length==0) return false;
+                if(event.target.id!="search_input" && $(".concept_"+current.uri.md5()).length>0) {
                 switch(event.keyCode) {
                      //37 l 38 o 39 r 40 u 13 enter
                     case 13:
@@ -548,7 +564,6 @@ function SKOSEditor(options) {
                         if(!item) setCurrent($(".concept_"+current.uri.md5()).parent());
                         else {
                             if(item.parent().hasClass('tree'))return false;
-                            if(timeout)clearTimeout(timeout);
                             setCurrent(item.parent().parent());
                         }
                         break;
@@ -557,7 +572,6 @@ function SKOSEditor(options) {
                         event.preventDefault();
                         if(!item) setCurrent($(".concept_"+current.uri.md5()).parent());
                         else {
-                            if(timeout)clearTimeout(timeout);
                             if(item.prev().length == 0) setCurrent(item.parent().children().last());
                             else setCurrent(item.prev());
                         }
@@ -595,19 +609,19 @@ function SKOSEditor(options) {
                         event.preventDefault();
                         if(!item) setCurrent($(".concept_"+current.uri.md5()).parent());
                         else {
-                            if(timeout)clearTimeout(timeout);
                             if(item.next().length == 0) setCurrent(item.parent().children().first());
                             else setCurrent(item.next());
                         }
                         break;
-                }
+                }}
             });
 
             function setCurrent(li) {
                 item = li;
                 $(".navi").removeClass("navi");
                 li.addClass("navi");
-                timeout = setTimeout(function(){
+                window.clearTimeout(timeout);
+                timeout = window.setTimeout(function() {
                     $(".navi").removeClass("navi");
                     item = undefined;
                 },2000);
@@ -1872,17 +1886,98 @@ function SKOSEditor(options) {
          * @param current
          */
         function SettingsPopup() {
+
+            var updated = false;
+            var timeout;
+
             $("#"+background).show();
             $("#" + container).load("html/settings.html", function() {
                 $(".popup_cancel").click(function() {
+                    clearTimeout(timeout);
                     close();
+                    if(updated)events.fire(new Event(EventCode.SETTINGS.UPDATED));
                 });
-                $("#popup_save").click(function() {
-                    alert("is not implemented yet");
-                    events.fire(new Event(EventCode.SETTINGS.UPDATED));
-                    close();
-                });
+                //write data
+                init();
             });
+
+            function init() {
+
+                $("#settings_language_firstLanguageSelect").change(function(){
+                     setFirstLang($("#settings_language_firstLanguageSelect").val());
+                });
+                $("#settings_language_newLanguageButton").click(function(){
+                     var n = $("#settings_language_newLanguageInput").val();
+                     if(n=="") writeInfo("language may not be empty");
+                     else {
+                        addLang(n);
+                     }
+                });
+                write();
+            }
+
+            function write() {
+                var lang = settings.getLanguage();
+                var langs = settings.getLanguages();
+                function writeLI(l){
+                   var li = $("<li><span>"+l+"</span></li>").append($("<button class='button'></button>").html("<i class='icon-minus'></i>").click(function(){
+                        removeLang(l);
+                    }));
+                    return li;
+                }
+                $("#settings_language_list").empty();
+                for(var i in langs) {
+                    $("#settings_language_list").append(writeLI(langs[i]));
+                }
+                $("#settings_language_firstLanguageSelect").empty();
+                for(var i in langs) {
+                    if(lang==langs[i]) $("#settings_language_firstLanguageSelect").append("<option selected='selected'>"+langs[i]+"</option>");
+                    else  $("#settings_language_firstLanguageSelect").append("<option>"+langs[i]+"</option>");
+                }
+            }
+
+            function removeLang(lang) {
+                if(settings.getLanguages().length==1) {
+                    writeInfo("graph must support at least one language"); return;
+                }
+                if(lang==settings.getLanguage()) {
+                    writeInfo("first language cannot be deleted"); return;
+                }
+                var ls = settings.getLanguages();
+                var ls2 = [];
+                for(i in ls) {
+                    if(ls[i]!=lang) ls2.push(ls[i]);
+                }
+                skos.set.graphLanguages(graph,ls2,function(){
+                    settings.setLanguages(ls2);
+                    updated = true;
+                    write();
+                },function(){alert("could not set languages")});
+            }
+
+            function setFirstLang(lang) {
+                skos.set.graphFirstLanguage(graph,lang,function(){
+                    updated = true;
+                },function(){alert("could not set language")});
+            }
+
+            function addLang(lang) {
+                var ls = settings.getLanguages();
+                for(i in ls) {
+                    if(ls[i]==lang) return;
+                }
+                ls.push(lang);
+                skos.set.graphLanguages(graph,ls,function(){
+                    settings.setLanguages(ls);
+                    updated = true;
+                    write();
+                },function(){alert("could not set languages")});
+            }
+
+            function writeInfo(text) {
+                $("#settings_language_info").text(text);
+                timeout = setTimeout(function(){$("#settings_language_info").empty()},2000);
+            }
         }
 
         function close(){

@@ -65,36 +65,30 @@
                        <table>
                            <tr><td style="vertical-align:top;width:190px;padding-top: 5px;">Displayed Languages</td><td>
                                <ul id="settings_language_list">
-                                   <li><span>de</span><button class="button"><i class="icon-minus"></i></button></li>
-                                   <li><span>en</span><button class="button"><i class="icon-minus"></i></button></li>
+                                   <!--<li><span>de</span><button class="button"><i class="icon-minus"></i></button></li>
+                                   <li><span>en</span><button class="button"><i class="icon-minus"></i></button></li>-->
                                </ul>
                            </td></tr>
                            <tr><td>Add Language</td><td>
-                               <select>
-                                   <option></option>
-                                   <option>none</option>
-                                   <option>de</option>
-                                   <option>en</option>
-                                   <option>it</option>
-                               </select>
-                               <button class="button"><i class="icon-plus"></i></button>
+                               <input id="settings_language_newLanguageInput" type="text" maxlength="5" style="width: 40px">
+                               <button id="settings_language_newLanguageButton" class="button"><i class="icon-plus"></i></button>
                            </td></tr>
                            <tr><td>First Language</td><td>
-                               <select>
-                                   <option>none</option>
-                                   <option>de</option>
+                               <select id="settings_language_firstLanguageSelect">
+                                   <!--<option>none</option>
+                                   <option>de</option>-->
                                </select>
                            </td></tr>
                        </table>
+                       <p style="color:red" id="settings_language_info"></p>
                 </div>
                 <div style="display:none;padding: 5px" id="settingslist_other">
-                       TODO
+                     No more Settings possible at the moment ...
                 </div>
             </div>
             <div class="clear"></div>
         </div>
         <div style="margin-top:10px;width: 100%;text-align: center;float:left;">
-            <button id="popup_save">Save</button>
             <button class="popup_cancel">Cancel</button>
         </div>
         <div class="clear"></div>
