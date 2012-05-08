@@ -111,7 +111,7 @@ function SKOSClient(options) {
         value : function(graph, uri, property, value, language, onsuccess, onfailure) {
             var datetime = currentDateTime();
             language = language&&language!='none'?"@"+language:"";
-            var query = "WITH <" + graph + "> DELETE {<" + uri + "><"+ namespaces.DC_TERMS+"modified>[]} INSERT DATA{<" + uri + "> <" + property + ">\"" + value + "\"" + language + ";<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>}";
+            var query = "WITH <" + graph + "> DELETE {<" + uri + "><"+ namespaces.DC_TERMS+"modified>[]} INSERT {<" + uri + "> <" + property + ">\"" + value + "\"" + language + ";<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         },

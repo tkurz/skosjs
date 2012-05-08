@@ -549,7 +549,7 @@ function SKOSEditor(options) {
             var loading = false;
 
             $(window).keypress(function(event) {
-                if(event.target.id!="search_input" && $(".concept_"+current.uri.md5()).length>0) {
+                if(graph && event.target.id!="search_input" && $(".concept_"+current.uri.md5()).length>0) {
                 switch(event.keyCode) {
                      //37 l 38 o 39 r 40 u 13 enter
                     case 13:
