@@ -93,7 +93,8 @@ function SKOSEditor(options) {
     		SELECTED : 103,
     		DELETE : 104,
     		DELETED : 105,
-            LOAD : 106
+            LOAD : 106,
+            UPDATED: 107
     	},
     	CONCEPT : {
     		CREATE : 200,
@@ -112,7 +113,8 @@ function SKOSEditor(options) {
     		SELECT : 302,
     		SELECTED : 303,
     		DELETE : 304,
-    		DELETED : 305
+    		DELETED : 305,
+            UPDATED : 306
     	},
         PROPERTY : {
     		CREATE : 400,
@@ -131,6 +133,9 @@ function SKOSEditor(options) {
         SETTINGS : {
             UPDATE : 600,
             UPDATED : 601
+        },
+        VIEW : {
+            RELOAD : 700
         }
     }
 
@@ -1002,6 +1007,9 @@ function SKOSEditor(options) {
         var graph;
         var current;
         var source = this;
+
+        var views;
+
         //bind events
         events.bind(EventCode.CONCEPT.SELECTED,function(event){
             current = event.data;
@@ -1010,8 +1018,20 @@ function SKOSEditor(options) {
         events.bind(EventCode.GRAPH.LOAD,function(event){
             graph = event.data.uri;
         });
+
+        events.bind(EventCode.VIEW.RELOAD,function(event){
+            for(var i in event.data.uris) {
+                var uri = event.data.uris[i];
+                for(var j in views) {
+                    if(views[j].getProperty() == uri) {
+                        views[j].reload();
+                        console.info(uri);
+                    }
+                }
+            }
+        });
+
         this.init = function() {
-            //nothing to do
         }
 
         //load templates
@@ -1041,29 +1061,36 @@ function SKOSEditor(options) {
             })
             switch (type) {
                 case 'graph':
-                    createView(PROPERTIES.graph);
+                    views = createView(PROPERTIES.graph);
                     break;
                 case 'scheme':
-                    createView(PROPERTIES.scheme);
+                    views = createView(PROPERTIES.scheme);
                     break;
                 default:
-                    createView(PROPERTIES.concept);
+                    views = createView(PROPERTIES.concept);
                     break;
             }
         }
 
         //display in columns depending on configurations
         function createView(options) {
+
+            var v = [];
+
             for(var i=0;i<options.left.length;i++) {
                 var view = createPropertyView(options.left[i]);
                 $("#view_content_left").append(view.getBox());
                 bindEvents(view);
+                v.push(view);
             }
             for(var i=0;i<options.right.length;i++) {
                 var view = createPropertyView(options.right[i]);
                 $("#view_content_right").append(view.getBox());
                 bindEvents(view);
+                v.push(view);
             }
+
+            return v;
         }
 
         //event-binding for rerender (e.g. modified, broader, etc)
@@ -1648,6 +1675,7 @@ function SKOSEditor(options) {
                              }
                          }
                         events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:list}));
+                         events.fire(new Event(EventCode.SCHEME.DELETED,{uri:event.data.uri}));
                         close();
                     },function(){popups.alert("Alert","Could not delete scheme!")});
                  },function(){popups.alert("Alert","Could not delete scheme!")});
@@ -1664,6 +1692,7 @@ function SKOSEditor(options) {
                              }
                          }
                         events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:list}));
+                        events.fire(new Event(EventCode.CONCEPT.DELETED,{uri:event.data.uri}));
                         close();
                     },function(){popups.alert("Alert","Could not delete scheme!")});
                 },function(){popups.alert("Alert","Could not delete scheme!")});
@@ -1679,6 +1708,7 @@ function SKOSEditor(options) {
                                 list.push(data[i].uri.value);
                              }
                          }
+                        list.push(event.data.uri);
                         events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:list}));
                         close();
                     },function(){popups.alert("Alert","Could not delete scheme!")});
@@ -1841,8 +1871,8 @@ function SKOSEditor(options) {
 
             function createScheme(uri,title) {
                 skos.create.scheme(graph,uri,title,function() {
-                    events.fire(new Event(EventCode.SCHEME.CREATED, {parent:parent,uri:uri,type:'scheme'}));
-                    events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[parent,uri]}));
+                    events.fire(new Event(EventCode.SCHEME.CREATED, {parent:graph,uri:uri,type:'scheme'}));
+                    events.fire(new Event(EventCode.GRAPH.UPDATED, {uris:[graph]}));
                     close();
                 }, function() {
                     popups.alert("Alert","could not create concept",close);
@@ -1851,7 +1881,7 @@ function SKOSEditor(options) {
             function createTopConcept(parent,uri,title) {
                 skos.create.top_concept(graph,parent,uri,title,function() {
                     events.fire(new Event(EventCode.CONCEPT.CREATED, {parent:parent,uri:uri,type:'top-concept'}));
-                    events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[parent,uri]}));
+                    events.fire(new Event(EventCode.SCHEME.UPDATED, {uris:[parent]}));
                     close();
                 }, function() {
                     popups.alert("Alert","could not create concept",close);
@@ -1860,7 +1890,7 @@ function SKOSEditor(options) {
             function createConcept(parent,uri,title) {
                 skos.create.concept(graph,parent,uri,title,function() {
                     events.fire(new Event(EventCode.CONCEPT.CREATED, {parent:parent,uri:uri,type:'concept'}));
-                    events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[parent,uri]}));
+                    events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[parent]}));
                     close();
                 }, function() {
                     popups.alert("Alert","could not create concept",close);
@@ -1893,7 +1923,6 @@ function SKOSEditor(options) {
                     var title = $("#popup_input").val();
                     skos.create.graph(uri, title, function() {
                         events.fire(new Event(EventCode.GRAPH.SELECTED, {uri:uri}));
-                        events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[uri]}));
                         close();
                     }, function() {
                         popups.alert("Alert", "could not create graph", close);
@@ -2000,7 +2029,7 @@ function SKOSEditor(options) {
                     if(ls[i]!=lang) ls2.push(ls[i]);
                 }
                 skos.set.graphLanguages(graph,ls2,function(){
-                    events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[graph]}));
+                    events.fire(new Event(EventCode.GRAPH.UPDATED,{uris:[graph]}));
                     settings.setLanguages(ls2);
                     updated = true;
                     write();
@@ -2009,7 +2038,7 @@ function SKOSEditor(options) {
 
             function setFirstLang(lang) {
                 skos.set.graphFirstLanguage(graph,lang,function(){
-                    events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[graph]}));
+                    events.fire(new Event(EventCode.GRAPH.UPDATED,{uris:[graph]}));
                     updated = true;
                 },function(){alert("could not set language")});
             }
@@ -2021,7 +2050,7 @@ function SKOSEditor(options) {
                 }
                 ls.push(lang);
                 skos.set.graphLanguages(graph,ls,function(){
-                    events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[graph]}));
+                    events.fire(new Event(EventCode.GRAPH.UPDATED,{uris:[graph]}));
                     settings.setLanguages(ls);
                     updated = true;
                     write();
