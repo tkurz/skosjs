@@ -12,11 +12,11 @@ function UserService(editor, host) {
             .complete(function() { if (callback) callback(); });
     }
 
-    return {
+    var us = {
         editor: editor,
         host: host,
         graph: null,
-        active: true;
+        active: true,
         init: function() {
             var self = this;
             self.editor.event.bind(editor.EventCode.GRAPH.LOAD, function(event) {
@@ -38,5 +38,7 @@ function UserService(editor, host) {
             });
         }
     };
+    us.init();
+    return us;
 }
 
