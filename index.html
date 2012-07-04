@@ -36,12 +36,13 @@
     <script type="text/javascript" src="skos-editor.0.2.0.js"></script>
     <script type="text/javascript">
 
+        var BASE = "http://labs.newmedialab.at/SKOS/"
         var OPTIONS = {
             RDF_LINK : function(uri){showRDF(uri)},
-            BASE_URI : "http://labs.newmedialab.at/SKOS/resource/",
+            BASE_URI : BASE+"resource/",
             LANGUAGES_SUPPORTED : ["en","de"],
-            ENDPOINT_SELECT : "http://labs.newmedialab.at/SKOS/sparql/select",
-            ENDPOINT_UPDATE : "http://labs.newmedialab.at/SKOS/sparql/update",
+            ENDPOINT_SELECT : BASE+"sparql/select",
+            ENDPOINT_UPDATE : BASE+"sparql/update",
             LANGUAGE : "en",
             DEBUG : false
         }
@@ -49,13 +50,13 @@
         $(document).ready(function(){
             var editor = new SKOSEditor(OPTIONS);
             //importer
-            var ioservice = new IOService(editor,"http://labs.newmedialab.at/SKOS/");
+            var ioservice = new IOService(editor,BASE);
 
             editor.init();
         });
 
         function showRDF(uri){
-             window.open("http://labs.newmedialab.at/SKOS/meta/text/html?uri="+encodeURIComponent(uri));
+             window.open(BASE+"meta/text/html?uri="+encodeURIComponent(uri));
         }
     </script>
     <link type="text/css" rel="stylesheet" href="css/font-awesome.css">
