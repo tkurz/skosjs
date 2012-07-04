@@ -32,6 +32,7 @@
     <script type="text/javascript" src="js/sparql-client.js"></script>
     <script type="text/javascript" src="js/skos-client.js"></script>
     <script type="text/javascript" src="extension/lmf/ioservice.js"></script>
+    <script type="text/javascript" src="extension/lmf/user.js"></script>
     <script type="text/javascript" src="js/templates.js"></script>
     <script type="text/javascript" src="skos-editor.0.2.0.js"></script>
     <script type="text/javascript">
@@ -51,6 +52,7 @@
             var editor = new SKOSEditor(OPTIONS);
             //importer
             var ioservice = new IOService(editor,BASE);
+            var user = new UserService(editor, BASE);
 
             editor.init();
         });
