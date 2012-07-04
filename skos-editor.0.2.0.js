@@ -103,7 +103,8 @@ function SKOSEditor(options) {
     		DELETE : 204,
     		DELETED : 205,
             DRAGSTART: 206,
-            DRAGEND: 207
+            DRAGEND: 207,
+            UPDATED: 208
     	},
     	SCHEME : {
     		CREATE : 300,
@@ -809,10 +810,12 @@ function SKOSEditor(options) {
                     if(type=='scheme') {
                         skos.set.topConcept(graph.uri,data.uri.value,uri,function(){
                             events.fire(new Event(EventCode.RELATION.CREATED,{type:"topConcept",parent:data.uri.value,child:uri},source));
+                            events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[data.uri.value,uri]}));
                         },function(){popups.alert("Alert","could not add narrower")});
                     } else {
                         skos.set.broaderNarrower(graph.uri,data.uri.value,uri,function(){
                             events.fire(new Event(EventCode.RELATION.CREATED,{type:"broaderNarrower",broader:data.uri.value,narrower:uri},source));
+                            events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[data.uri.value,uri]}));
                         },function(){popups.alert("Alert","could not add narrower")});
                     }
                     return false;
@@ -1222,6 +1225,7 @@ function SKOSEditor(options) {
                                 var htmlStr = templ2.find(".literal_input").val().n3escapeToHMTL();
                                 skos.update.value(graph, current.uri, property, templ1.find(".literal_text").attr('original').n3escape(), n3str, language, function() {
                                     events.fire(new Event(EventCode.PROPERTY.UPDATED, {uri:current.uri,property:property,language:language,value:n3str}, source));
+                                    events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[current.uri]}));
                                     templ1.find(".literal_text").html(htmlStr);
                                     templ1.find(".literal_text").attr('original',n3str);
                                     templ2.hide();
@@ -1237,6 +1241,7 @@ function SKOSEditor(options) {
                                 if (confirm("delete property?")) {
                                     skos._delete.value(graph, current.uri, property, templ1.find(".literal_text").attr('original').n3escape(), language, function() {
                                         events.fire(new Event(EventCode.PROPERTY.DELETED, {uri:current.uri,property:property,language:language}, source));
+                                        events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[current.uri]}));
                                         load();
                                     });
                                 }
@@ -1263,6 +1268,7 @@ function SKOSEditor(options) {
                                 } else {
                                     skos.set.value(graph,current.uri,property,inp,language,function(){
                                         events.fire(new Event(EventCode.PROPERTY.CREATED,{uri:current.uri,property:property,language:language,value:inp},source));
+                                        events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[current.uri]}));
                                         load();
                                     });
                                 }
@@ -1352,6 +1358,7 @@ function SKOSEditor(options) {
                     if (check(newT)) {
                         skos.update.uri(graph, current.uri, property, oldT, newT, function() {
                             events.fire(new Event(EventCode.PROPERTY.UPDATED, {uri:current.uri,property:property,value:newT}, source));
+                            events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[current.uri]}));
                             templ1.find(".literal_text").text(newT);
                             templ2.hide();
                             templ1.show();
@@ -1369,6 +1376,7 @@ function SKOSEditor(options) {
                     if (confirm("delete property?")) {
                         skos._delete.uri(graph, current.uri, property, templ1.find(".literal_text").text(), function() {
                             events.fire(new Event(EventCode.PROPERTY.DELETED, {uri:current.uri,property:property}, source));
+                            events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[current.uri]}));
                             load();
                         });
                     }
@@ -1416,6 +1424,7 @@ function SKOSEditor(options) {
                             } else if(check(inp)){
                                 skos.set.uri(graph, current.uri, property, inp, function() {
                                     events.fire(new Event(EventCode.PROPERTY.CREATED, {uri:current.uri,property:property,value:inp}, source));
+                                    events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[current.uri]}));
                                     load();
                                 });
                             } else {
@@ -1480,23 +1489,29 @@ function SKOSEditor(options) {
                          if(property=="http://www.w3.org/2004/02/skos/core#broader") {
                              skos._delete.broaderNarrower(graph,data.uri.value,current.uri,function(){
                                  events.fire(new Event(EventCode.RELATION.DELETED,{type:"broader",narrower:current.uri,broader:data.uri.value},source));
+                                 events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[current.uri,data.uri.value]}));
                              },function(){popups.alert("Alert","could not delete relation")});
                          } else if(property=="http://www.w3.org/2004/02/skos/core#narrower") {
                               skos._delete.broaderNarrower(graph,current.uri,data.uri.value,function(){
                                   events.fire(new Event(EventCode.RELATION.DELETED,{type:"narrower",narrower:data.uri.value,broader:current.uri},source));
+                                  events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[current.uri,data.uri.value]}));
                              },function(){popups.alert("Alert","could not delete relation")});
                          } else if((property=="http://www.w3.org/2004/02/skos/core#hasTopConcept")) {
                               skos._delete.topConcept(graph,current.uri,data.uri.value,function(){
                                   events.fire(new Event(EventCode.RELATION.DELETED,{type:"topConcept",parent:current.uri,child:data.uri.value},source));
+                                  events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[current.uri,data.uri.value]}));
                              },function(){popups.alert("Alert","could not delete relation")});
                          } else if((property=="http://www.w3.org/2004/02/skos/core#related")) {
                               skos._delete.related(graph,current.uri,data.uri.value,function(){
                                   events.fire(new Event(EventCode.RELATION.DELETED,{type:"related",concept1:current.uri,concept2:data.uri.value},source));
+                                  events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[current.uri,data.uri.value]}));
                                   load();
                               },function(){popups.alert("Alert","could not delete relation")});
                          }  else {
                             skos._delete.uri(graph,current.uri,property,data.uri.value,function(){
+                                //TODO check event
                                   events.fire(new Event(EventCode.RELATION.CREATED,{type:property,concept1:current.uri,concept2:data.uri.value},source));
+                                  events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[current.uri,data.uri.value]}));
                                   load();
                              },function(){popups.alert("Alert","could not create relation")});
                          }
@@ -1559,23 +1574,28 @@ function SKOSEditor(options) {
                         if(property=="http://www.w3.org/2004/02/skos/core#broader") {
                              skos.set.broaderNarrower(graph,uri,current.uri,function(){
                                  events.fire(new Event(EventCode.RELATION.CREATED,{type:"broader",broader:uri,narrower:current.uri},source));
+                                 events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[current.uri,data.uri]}));
                              },function(){popups.alert("Alert","could not set relation")});
                          } else if(property=="http://www.w3.org/2004/02/skos/core#narrower") {
                               skos.set.broaderNarrower(graph,current.uri,uri,function(){
                                   events.fire(new Event(EventCode.RELATION.CREATED,{type:"narrower",narrower:uri,broader:current.uri},source));
+                                  events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[current.uri,data.uri]}));
                              },function(){popups.alert("Alert","could not set relation")});
                          } else if((property=="http://www.w3.org/2004/02/skos/core#hasTopConcept")) {
                               skos.set.topConcept(graph,current.uri,uri,function(){
                                   events.fire(new Event(EventCode.RELATION.CREATED,{type:"topConcept",parent:current.uri,child:uri},source));
+                                  events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[current.uri,data.uri]}));
                              },function(){popups.alert("Alert","could not set relation");});
                          } else if((property=="http://www.w3.org/2004/02/skos/core#related")) {
                               skos.set.related(graph,current.uri,uri,function(){
                                   events.fire(new Event(EventCode.RELATION.CREATED,{type:"related",concept1:current.uri,concept2:uri},source));
+                                  events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[current.uri,data.uri]}));
                                   load();
                              },function(){popups.alert("Alert","could not create relation")});
                          }  else {
                               skos.set.uri(graph,current.uri,property,uri,function(){
                                   events.fire(new Event(EventCode.RELATION.CREATED,{type:property,concept1:current.uri,concept2:uri},source));
+                                  events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[current.uri,data.uri]}));
                                   load();
                              },function(){popups.alert("Alert","could not create relation")});
                          }
@@ -1610,7 +1630,7 @@ function SKOSEditor(options) {
         });
         events.bind(EventCode.CONCEPT.DELETE,function(event){
             var deleteGraph = function() {
-                alert("Not implemented yet");close();
+                skos._delete.graph()
             }
 
             var deleteSchemeAll = function() {
@@ -1618,23 +1638,50 @@ function SKOSEditor(options) {
             }
 
             var deleteSchemeOnly = function() {
-                 skos._delete.concept(graph,event.data.uri,function(){
-                     events.fire(new Event(EventCode.GRAPH.SELECTED,{uri:graph},self));
-                     close();
+                skos.list.incomings(graph,event.data.uri,function(data){
+                     skos._delete.concept(graph,event.data.uri,function(){
+                        events.fire(new Event(EventCode.GRAPH.SELECTED,{uri:graph},self));
+                         var list = [];
+                         for(var i in data) {
+                             if(data[i].uri.value != event.data.uri) {
+                                list.push(data[i].uri.value);
+                             }
+                         }
+                        events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:list}));
+                        close();
+                    },function(){popups.alert("Alert","Could not delete scheme!")});
                  },function(){popups.alert("Alert","Could not delete scheme!")});
             }
 
             var deleteConceptAll = function() {
-                skos._delete.concept(graph,event.data.uri,function(){
-                     events.fire(new Event(EventCode.GRAPH.SELECTED,{uri:graph},self));
-                     close();
-                 },function(){popups.alert("Alert","Could not delete scheme!")});
+                skos.list.incomings(graph,event.data.uri,function(data){
+                    skos._delete.concept(graph,event.data.uri,function(){
+                        events.fire(new Event(EventCode.GRAPH.SELECTED,{uri:graph},self));
+                        var list = [];
+                         for(var i in data) {
+                             if(data[i].uri.value != event.data.uri) {
+                                list.push(data[i].uri.value);
+                             }
+                         }
+                        events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:list}));
+                        close();
+                    },function(){popups.alert("Alert","Could not delete scheme!")});
+                },function(){popups.alert("Alert","Could not delete scheme!")});
             }
 
             var deleteConceptRelations = function() {
-                skos._delete.skosRelations(graph,event.data.uri,function(){
-                     events.fire(new Event(EventCode.GRAPH.SELECTED,{uri:graph},self));
-                     close();
+                skos.list.incomings(graph,event.data.uri,function(data){
+                    skos._delete.skosRelations(graph,event.data.uri,function(){
+                        events.fire(new Event(EventCode.GRAPH.SELECTED,{uri:graph},self));
+                        var list = [];
+                         for(var i in data) {
+                             if(data[i].uri.value != event.data.uri) {
+                                list.push(data[i].uri.value);
+                             }
+                         }
+                        events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:list}));
+                        close();
+                    },function(){popups.alert("Alert","Could not delete scheme!")});
                  },function(){popups.alert("Alert","Could not delete scheme!")});
             }
 
@@ -1795,6 +1842,7 @@ function SKOSEditor(options) {
             function createScheme(uri,title) {
                 skos.create.scheme(graph,uri,title,function() {
                     events.fire(new Event(EventCode.SCHEME.CREATED, {parent:parent,uri:uri,type:'scheme'}));
+                    events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[parent,uri]}));
                     close();
                 }, function() {
                     popups.alert("Alert","could not create concept",close);
@@ -1803,6 +1851,7 @@ function SKOSEditor(options) {
             function createTopConcept(parent,uri,title) {
                 skos.create.top_concept(graph,parent,uri,title,function() {
                     events.fire(new Event(EventCode.CONCEPT.CREATED, {parent:parent,uri:uri,type:'top-concept'}));
+                    events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[parent,uri]}));
                     close();
                 }, function() {
                     popups.alert("Alert","could not create concept",close);
@@ -1811,6 +1860,7 @@ function SKOSEditor(options) {
             function createConcept(parent,uri,title) {
                 skos.create.concept(graph,parent,uri,title,function() {
                     events.fire(new Event(EventCode.CONCEPT.CREATED, {parent:parent,uri:uri,type:'concept'}));
+                    events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[parent,uri]}));
                     close();
                 }, function() {
                     popups.alert("Alert","could not create concept",close);
@@ -1843,6 +1893,7 @@ function SKOSEditor(options) {
                     var title = $("#popup_input").val();
                     skos.create.graph(uri, title, function() {
                         events.fire(new Event(EventCode.GRAPH.SELECTED, {uri:uri}));
+                        events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[uri]}));
                         close();
                     }, function() {
                         popups.alert("Alert", "could not create graph", close);
@@ -1949,6 +2000,7 @@ function SKOSEditor(options) {
                     if(ls[i]!=lang) ls2.push(ls[i]);
                 }
                 skos.set.graphLanguages(graph,ls2,function(){
+                    events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[graph]}));
                     settings.setLanguages(ls2);
                     updated = true;
                     write();
@@ -1957,6 +2009,7 @@ function SKOSEditor(options) {
 
             function setFirstLang(lang) {
                 skos.set.graphFirstLanguage(graph,lang,function(){
+                    events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[graph]}));
                     updated = true;
                 },function(){alert("could not set language")});
             }
@@ -1968,6 +2021,7 @@ function SKOSEditor(options) {
                 }
                 ls.push(lang);
                 skos.set.graphLanguages(graph,ls,function(){
+                    events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[graph]}));
                     settings.setLanguages(ls);
                     updated = true;
                     write();

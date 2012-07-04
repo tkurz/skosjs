@@ -230,6 +230,11 @@ function SKOSClient(options) {
             var query = "WITH <" + graph + "> DELETE {<"+uri+"><" + namespaces.SKOS + "broader>?z.?a<" + namespaces.SKOS + "narrower><"+uri+">.<"+uri+"><" + namespaces.SKOS + "narrower>?r.?q<" + namespaces.SKOS + "broader><"+uri+">.<"+uri+"><" + namespaces.SKOS + "topConceptOf>?z.?a<" + namespaces.SKOS + "hasTopConcept><"+uri+">} WHERE {}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
+        },
+        graph : function(graph,onsuccess, onfailure) {
+            var query = "DROP GRAPH <"+graph+">";
+            if(OPTIONS.DEBUG)console.debug(query);
+            sparqlClient.update(query, onsuccess, onfailure);
         }
     }
     this.get = {
@@ -309,6 +314,11 @@ function SKOSClient(options) {
         },
         graphLanguages : function(graph,onsuccess, onfailure) {
             var query = "SELECT ?language WHERE {GRAPH <"+graph+">{<"+graph+"> <"+namespaces.SKOSJS+"hasLanguage> ?language}}";
+            if(OPTIONS.DEBUG)console.debug(query);
+            sparqlClient.select(query, onsuccess, onfailure);
+        },
+        incomings : function(graph,uri,onsuccess, onfailure) {
+            var query = "SELECT DISTINCT ?uri WHERE {GRAPH <" + graph + "> {?uri ?property <"+uri+">}}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.select(query, onsuccess, onfailure);
         }

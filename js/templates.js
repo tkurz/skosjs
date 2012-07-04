@@ -58,7 +58,7 @@ var HTML_TEMPLATES = {
             },
             literal : {
                 view:   '<tr class="view_display">' +
-                        '   <td><div style="width: 100%;height:25px;"><div style="border: 1px dashed #d3d3d3;height:16px;margin-right: 3px;padding-left:2px;cursor:text">' +
+                        '   <td><div style="width: 100%;min-height:25px;"><div style="border: 1px dashed #d3d3d3;min-height:16px;margin-right: 3px;padding-left:2px;cursor:text">' +
                         '       <div class="literal_text" style="width:100%;border:none;margin:0;font-size: 12px;padding-top: 2px;overflow: auto;"></div>' +
                         '       </div></div>' +
                         '   </td>' +
@@ -84,7 +84,7 @@ var HTML_TEMPLATES = {
                         '</tr>',
                 fix:    '<tr class="view_display">' +
                         '   <td>' +
-                        '       <div style="width: 100%;height:25px;"><div style="border: 1px dashed #d3d3d3;height:16px;margin-right: 3px;padding-left:2px">' +
+                        '       <div style="width: 100%;min-height:25px;"><div style="border: 1px dashed #d3d3d3;min-height:16px;margin-right: 3px;padding-left:2px">' +
                         '           <div class="literal_text" style="width:100%;border:none;margin:0;font-size: 12px;padding-top: 3px;overflow: auto;"></div>' +
                         '       </div></div>' +
                         '   </td>' +
