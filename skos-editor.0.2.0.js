@@ -1070,6 +1070,21 @@ function SKOSEditor(options) {
                     break;
                 default:
                     views = createView(PROPERTIES.concept);
+                    // Enabel DnD for concepts
+                    var c = $("#view_header_rdf_link").closest(".draghandle");
+                    c.attr("draggable",true).addClass("draggable");
+                    c.get(0).addEventListener('dragstart', function(e){
+                        events.fire(new Event(EventCode.CONCEPT.DRAGSTART));
+                        this.style.opacity = '0.4';
+                        //e.dataTransfer.effectAllowed = 'move';
+                        e.dataTransfer.setData('text/uri-list', uri);
+                        //e.dataTransfer.setData('parent', parent_uri);
+                    }, false);
+                    c.get(0).addEventListener('dragend', function(e){
+                        events.fire(new Event(EventCode.CONCEPT.DRAGEND));
+                        $('.dragover').removeClass('dragover');
+                        $('.draggable').css('opacity',1);
+                    }, false);
                     break;
             }
         }
