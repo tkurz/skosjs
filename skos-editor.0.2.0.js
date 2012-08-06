@@ -40,10 +40,10 @@ function SKOSEditor(options) {
                 {title:"Description",property:"http://purl.org/dc/elements/1.1/description",type:"text",multivalue:false,multilingual:true,editable:true}
             ],
             right:[
-                {title:"Author",property:"http://purl.org/dc/elements/1.1/author",type:"string",multivalue:true,multilingual:false,editable:true},
+                {title:"Author",property:"http://purl.org/dc/elements/1.1/creator",type:"uri",multivalue:false,multilingual:false,editable:false},
                 {title:"Created",property:"http://purl.org/dc/terms/created",type:"string",multivalue:false,multilingual:false,editable:false},
                 {title:"Publisher (Organisation)",property:"http://purl.org/dc/elements/1.1/publisher",type:"string",multivalue:true,multilingual:false,editable:true},
-                {title:"Contributor",property:"http://purl.org/dc/elements/1.1/contributor",type:"string",multivalue:true,multilingual:false,editable:true}
+                {title:"Contributors",property:"http://purl.org/dc/elements/1.1/contributor",type:"uri",multivalue:true,multilingual:false,editable:false}
             ]
         },
         scheme : {
@@ -53,11 +53,11 @@ function SKOSEditor(options) {
             right:[
                 {title:"Title",property:"http://www.w3.org/2000/01/rdf-schema#label",type:"string",multivalue:false,multilingual:true,editable:true},
                 {title:"Description",property:"http://purl.org/dc/elements/1.1/description",type:"text",multivalue:false,multilingual:true,editable:true},
-                {title:"Author",property:"http://purl.org/dc/elements/1.1/author",type:"string",multivalue:true,multilingual:false,editable:true},
+                {title:"Author",property:"http://purl.org/dc/elements/1.1/creator",type:"uri",multivalue:false,multilingual:false,editable:false},
                 {title:"Created",property:"http://purl.org/dc/terms/created",type:"string",multivalue:false,multilingual:false,editable:false},
                 {title:"Modified",property:"http://purl.org/dc/terms/modified",type:"string",multivalue:false,multilingual:false,editable:false},
                 {title:"Publisher (Organisation)",property:"http://purl.org/dc/elements/1.1/publisher",type:"string",multivalue:true,multilingual:false,editable:true},
-                {title:"Contributor",property:"http://purl.org/dc/elements/1.1/contributor",type:"string",multivalue:true,multilingual:false,editable:true},
+                {title:"Contributors",property:"http://purl.org/dc/elements/1.1/contributor",type:"uri",multivalue:true,multilingual:false,editable:false},
                 {title:"License",property:"http://purl.org/dc/terms/license",type:"uri",multivalue:true,droppable:false,editable:true}
             ]
         },
@@ -75,8 +75,10 @@ function SKOSEditor(options) {
                 {title:"Preferred Label",property:"http://www.w3.org/2004/02/skos/core#prefLabel",type:"string",multivalue:false,multilingual:true,editable:true},
                 {title:"Alternative Label",property:"http://www.w3.org/2004/02/skos/core#altLabel",type:"string",multivalue:true,multilingual:true,editable:true},
                 {title:"Hidden Label",property:"http://www.w3.org/2004/02/skos/core#hiddenLabel",type:"string",multivalue:true,multilingual:true,editable:true},
+                {title:"Author",property:"http://purl.org/dc/elements/1.1/creator",type:"uri",multivalue:false,multilingual:false,editable:false},
                 {title:"Created",property:"http://purl.org/dc/terms/created",type:"string",multivalue:false,multilingual:false,editable:false},
                 {title:"Modified",property:"http://purl.org/dc/terms/modified",type:"string",multivalue:false,multilingual:false,editable:false},
+                {title:"Contributors",property:"http://purl.org/dc/elements/1.1/contributor",type:"uri",multivalue:true,multilingual:false,editable:false},
                 {title:"Definition",property:"http://www.w3.org/2004/02/skos/core#definition",type:"text",multivalue:false,multilingual:true,editable:true},
                 {title:"Hidden Label",property:"http://www.w3.org/2004/02/skos/core#hiddenLabel",type:"string",multivalue:true,multilingual:true,editable:true}
             ]
@@ -1068,6 +1070,21 @@ function SKOSEditor(options) {
                     break;
                 default:
                     views = createView(PROPERTIES.concept);
+                    // Enabel DnD for concepts
+                    var c = $("#view_header_rdf_link").closest(".draghandle");
+                    c.attr("draggable",true).addClass("draggable");
+                    c.get(0).addEventListener('dragstart', function(e){
+                        events.fire(new Event(EventCode.CONCEPT.DRAGSTART));
+                        this.style.opacity = '0.4';
+                        //e.dataTransfer.effectAllowed = 'move';
+                        e.dataTransfer.setData('text/uri-list', uri);
+                        //e.dataTransfer.setData('parent', parent_uri);
+                    }, false);
+                    c.get(0).addEventListener('dragend', function(e){
+                        events.fire(new Event(EventCode.CONCEPT.DRAGEND));
+                        $('.dragover').removeClass('dragover');
+                        $('.draggable').css('opacity',1);
+                    }, false);
                     break;
             }
         }
@@ -1507,9 +1524,23 @@ function SKOSEditor(options) {
                 var title = data.title?data.title.value:data.uri.value;
                 if(editable) {
                     var temp = $(concept_edit_template);
-                    temp.find(".concept_text").text(title).click(function() {
+                    var c = temp.find(".concept_text");
+                    c.text(title).click(function() {
                         events.fire(new Event(EventCode.CONCEPT.SELECTED,{uri:data.uri.value,type:'concept'},source));
                     });
+                    c.attr("draggable",true).addClass("draggable");
+                    c.get(0).addEventListener('dragstart', function(e){
+                        events.fire(new Event(EventCode.CONCEPT.DRAGSTART));
+                        this.style.opacity = '0.4';
+                        //e.dataTransfer.effectAllowed = 'move';
+                        e.dataTransfer.setData('text/uri-list', data.uri.value);
+                        //e.dataTransfer.setData('parent', parent_uri);
+                    }, false);
+                    c.get(0).addEventListener('dragend', function(e){
+                        events.fire(new Event(EventCode.CONCEPT.DRAGEND));
+                        $('.dragover').removeClass('dragover');
+                        $('.draggable').css('opacity',1);
+                    }, false);
                     table.append(temp);
                     temp.find(".concept_delete").click(function(){
                          if(!confirm("delete relation")) return false;
@@ -1545,9 +1576,23 @@ function SKOSEditor(options) {
                     })
                 } else {
                     var temp = $(concept_fix_template);
-                    temp.find(".concept_text").text(title).click(function() {
+                    var c = temp.find(".concept_text");
+                    c.text(title).click(function() {
                         events.fire(new Event(EventCode.CONCEPT.SELECT,current,source));
                     });
+                    c.attr("draggable",true).addClass("draggable");
+                    c.get(0).addEventListener('dragstart', function(e){
+                        events.fire(new Event(EventCode.CONCEPT.DRAGSTART));
+                        this.style.opacity = '0.4';
+                        //e.dataTransfer.effectAllowed = 'move';
+                        e.dataTransfer.setData('text/uri-list', data.uri.value);
+                        //e.dataTransfer.setData('parent', parent_uri);
+                    }, false);
+                    c.get(0).addEventListener('dragend', function(e){
+                        events.fire(new Event(EventCode.CONCEPT.DRAGEND));
+                        $('.dragover').removeClass('dragover');
+                        $('.draggable').css('opacity',1);
+                    }, false);
                     table.append(temp);
                 }
             }
@@ -1922,6 +1967,7 @@ function SKOSEditor(options) {
                     var uri = OPTIONS.BASE_URI + String.random(8);
                     var title = $("#popup_input").val();
                     skos.create.graph(uri, title, function() {
+                        events.fire(new Event(EventCode.GRAPH.CREATED, {uri:uri}));
                         events.fire(new Event(EventCode.GRAPH.SELECTED, {uri:uri}));
                         close();
                     }, function() {

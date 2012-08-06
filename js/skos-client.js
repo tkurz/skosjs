@@ -111,19 +111,19 @@ function SKOSClient(options) {
         value : function(graph, uri, property, value, language, onsuccess, onfailure) {
             var datetime = currentDateTime();
             language = language&&language!='none'?"@"+language:"";
-            var query = "WITH <" + graph + "> DELETE {<" + uri + "><"+ namespaces.DC_TERMS+"modified>[]} INSERT {<" + uri + "> <" + property + ">\"" + value + "\"" + language + ";<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
+            var query = "WITH <" + graph + "> DELETE {<" + uri + "><"+ namespaces.DC_TERMS+"modified>?_mod} INSERT {<" + uri + "> <" + property + ">\"" + value + "\"" + language + ";<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         },
         uri : function(graph, uri, property, value, onsuccess, onfailure) {
             var datetime = currentDateTime();
-            var query = "WITH <" + graph + "> DELETE {<" + uri + "><"+ namespaces.DC_TERMS+"modified>[]} INSERT {<" + uri + "> <" + property + "><" + value + ">;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
+            var query = "WITH <" + graph + "> DELETE {<" + uri + "><"+ namespaces.DC_TERMS+"modified>?_mod} INSERT {<" + uri + "> <" + property + "><" + value + ">;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         },
         values : function(graph, uri, list, onsuccess, onfailure) {
             var datetime = currentDateTime();
-            var query = "WITH <" + graph + "> DELETE {<" + uri + "><"+ namespaces.DC_TERMS+"modified>[]}  INSERT {<" + uri + ">";
+            var query = "WITH <" + graph + "> DELETE {<" + uri + "><"+ namespaces.DC_TERMS+"modified>?_mod}  INSERT {<" + uri + ">";
             for(var i=0; i<list.length;i++) {
                 switch (list[i].type) {
                     case 'uri':     query += "<" + list[i].property + "><" + list[i].value + ">";
@@ -141,19 +141,19 @@ function SKOSClient(options) {
         },
         broaderNarrower : function(graph,broader,narrower, onsuccess, onfailure) {
             var datetime = currentDateTime();
-            var query = "WITH <" + graph + "> DELETE {<" + narrower + "><"+ namespaces.DC_TERMS+"modified>[].<" + broader + "><"+ namespaces.DC_TERMS+"modified>[]} INSERT {<" + broader + "> <" + namespaces.SKOS + "narrower> <" + narrower + ">;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.<" + narrower + "> <" + namespaces.SKOS + "broader> <" + broader + ">;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
+            var query = "WITH <" + graph + "> DELETE {<" + narrower + "><"+ namespaces.DC_TERMS+"modified>?_mod1.<" + broader + "><"+ namespaces.DC_TERMS+"modified>?_mod2} INSERT {<" + broader + "> <" + namespaces.SKOS + "narrower> <" + narrower + ">;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.<" + narrower + "> <" + namespaces.SKOS + "broader> <" + broader + ">;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         },
         topConcept : function(graph,parent,child, onsuccess, onfailure) {
             var datetime = currentDateTime();
-            var query = "WITH <" + graph + "> DELETE {<" + parent + "><"+ namespaces.DC_TERMS+"modified>[].<" + child + "><"+ namespaces.DC_TERMS+"modified>[]} INSERT {<" + parent + "> <" + namespaces.SKOS + "hasTopConcept> <" + child + ">;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.<" + child + "> <" + namespaces.SKOS + "topConceptOf> <" + parent + ">;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
+            var query = "WITH <" + graph + "> DELETE {<" + parent + "><"+ namespaces.DC_TERMS+"modified>?_mod1.<" + child + "><"+ namespaces.DC_TERMS+"modified>?_mod2} INSERT {<" + parent + "> <" + namespaces.SKOS + "hasTopConcept> <" + child + ">;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.<" + child + "> <" + namespaces.SKOS + "topConceptOf> <" + parent + ">;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         },
         related : function(graph,concept1,concept2, onsuccess, onfailure) {
             var datetime = currentDateTime();
-            var query = "WITH <" + graph + "> DELETE {<" + concept1 + "><"+ namespaces.DC_TERMS+"modified>[].<" + concept2 + "><"+ namespaces.DC_TERMS+"modified>[]} INSERT {<" + concept1 + "> <" + namespaces.SKOS + "related> <" + concept2 + ">;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.<" + concept2 + "> <" + namespaces.SKOS + "related> <" + concept1 + ">;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
+            var query = "WITH <" + graph + "> DELETE {<" + concept1 + "><"+ namespaces.DC_TERMS+"modified>?_mod1.<" + concept2 + "><"+ namespaces.DC_TERMS+"modified>?_mod2} INSERT {<" + concept1 + "> <" + namespaces.SKOS + "related> <" + concept2 + ">;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.<" + concept2 + "> <" + namespaces.SKOS + "related> <" + concept1 + ">;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         },
@@ -162,12 +162,12 @@ function SKOSClient(options) {
             for(var i in languages) {
                 data += "<"+graph+"><"+namespaces.SKOSJS+"hasLanguage>\""+languages[i]+"\".";
             }
-            var query = "WITH <" + graph + "> DELETE {<"+graph+"><"+namespaces.SKOSJS+"hasLanguage>[]}INSERT {"+data+"} WHERE {}";
+            var query = "WITH <" + graph + "> DELETE {<"+graph+"><"+namespaces.SKOSJS+"hasLanguage>?_lang}INSERT {"+data+"} WHERE {}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         },
         graphFirstLanguage : function(graph,language,onsuccess, onfailure) {
-            var query = "WITH <" + graph + "> DELETE {<"+graph+"><"+namespaces.SKOSJS+"hasFirstLanguage>[]}INSERT {<"+graph+"><"+namespaces.SKOSJS+"hasFirstLanguage>\""+language+"\".} WHERE {}";
+            var query = "WITH <" + graph + "> DELETE {<"+graph+"><"+namespaces.SKOSJS+"hasFirstLanguage>?_firstLang}INSERT {<"+graph+"><"+namespaces.SKOSJS+"hasFirstLanguage>\""+language+"\".} WHERE {}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         }
@@ -177,13 +177,13 @@ function SKOSClient(options) {
         value : function(graph,uri,property,value_old,value_new,language,onsuccess, onfailure) {
             var datetime = currentDateTime();
             language = language&&language!='none'?"@"+language:"";
-            var query = "WITH <" + graph + "> DELETE {<" + uri + "> <" + property + "> \"" + value_old + "\"" + language + ";<"+ namespaces.DC_TERMS+"modified>[]} INSERT {<" + uri + "> <" + property + "> \"" + value_new + "\"" + language + ";<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.} WHERE {<" + uri + "> <" + property + "> \"" + value_old + "\"" + language + "}";
+            var query = "WITH <" + graph + "> DELETE {<" + uri + "> <" + property + "> \"" + value_old + "\"" + language + ";<"+ namespaces.DC_TERMS+"modified>?_mod} INSERT {<" + uri + "> <" + property + "> \"" + value_new + "\"" + language + ";<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.} WHERE {<" + uri + "> <" + property + "> \"" + value_old + "\"" + language + "}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         },
         uri : function(graph,uri,property,value_old,value_new,onsuccess, onfailure) {
             var datetime = currentDateTime();
-            var query = "WITH <" + graph + "> DELETE {<" + uri + "> <" + property + "> <" + value_old + ">;<"+ namespaces.DC_TERMS+"modified>[]} INSERT {<" + uri + "> <" + property + "> <" + value_new + ">;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.} WHERE {<" + uri + "> <" + property + "> <" + value_old + ">}";
+            var query = "WITH <" + graph + "> DELETE {<" + uri + "> <" + property + "> <" + value_old + ">;<"+ namespaces.DC_TERMS+"modified>?_mod} INSERT {<" + uri + "> <" + property + "> <" + value_new + ">;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.} WHERE {<" + uri + "> <" + property + "> <" + value_old + ">}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         }
@@ -193,31 +193,31 @@ function SKOSClient(options) {
         value : function(graph,uri,property,value,language,onsuccess, onfailure) {
             var datetime = currentDateTime();
             language = language&&language!='none'?"@"+language:"";
-            var query = "WITH <" + graph + "> DELETE {<" + uri + "> <" + property + "> \"" + value + "\"" + language + ";<"+ namespaces.DC_TERMS+"modified>[]} INSERT {<" + uri + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
+            var query = "WITH <" + graph + "> DELETE {<" + uri + "> <" + property + "> \"" + value + "\"" + language + ";<"+ namespaces.DC_TERMS+"modified>?_mod} INSERT {<" + uri + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         },
         uri : function(graph,uri,property,value,onsuccess, onfailure) {
             var datetime = currentDateTime();
-            var query = "WITH <" + graph + "> DELETE {<" + uri + "> <" + property + "> <" + value + ">;<"+ namespaces.DC_TERMS+"modified>[]} INSERT {<" + uri + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
+            var query = "WITH <" + graph + "> DELETE {<" + uri + "> <" + property + "> <" + value + ">;<"+ namespaces.DC_TERMS+"modified>?_mod} INSERT {<" + uri + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         },
         broaderNarrower : function(graph,broader,narrower,onsuccess, onfailure) {
             var datetime = currentDateTime();
-            var query = "WITH <" + graph + "> DELETE {<" + narrower + "> <" + namespaces.SKOS + "broader> <" + broader + ">;<"+ namespaces.DC_TERMS+"modified>[].<" + broader + "> <" + namespaces.SKOS + "narrower> <" + narrower + ">;<"+ namespaces.DC_TERMS+"modified>[]} INSERT {<" + broader + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.<" + narrower + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
+            var query = "WITH <" + graph + "> DELETE {<" + narrower + "> <" + namespaces.SKOS + "broader> <" + broader + ">;<"+ namespaces.DC_TERMS+"modified>?_mod1.<" + broader + "> <" + namespaces.SKOS + "narrower> <" + narrower + ">;<"+ namespaces.DC_TERMS+"modified>?_mod2} INSERT {<" + broader + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.<" + narrower + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         },
         topConcept : function(graph,parent,child,onsuccess, onfailure) {
             var datetime = currentDateTime();
-            var query = "WITH <" + graph + "> DELETE {<" + parent + "> <" + namespaces.SKOS + "hasTopConcept> <" + child + ">;<"+ namespaces.DC_TERMS+"modified>[].<" + child + "> <" + namespaces.SKOS + "topConceptOf> <" + parent + ">;<"+ namespaces.DC_TERMS+"modified>[]} INSERT {<" + parent + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.<" + child + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
+            var query = "WITH <" + graph + "> DELETE {<" + parent + "> <" + namespaces.SKOS + "hasTopConcept> <" + child + ">;<"+ namespaces.DC_TERMS+"modified>?_mod1.<" + child + "> <" + namespaces.SKOS + "topConceptOf> <" + parent + ">;<"+ namespaces.DC_TERMS+"modified>?_mod2} INSERT {<" + parent + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.<" + child + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         },
         related : function(graph,concept1,concept2,onsuccess, onfailure) {
             var datetime = currentDateTime();
-            var query = "WITH <" + graph + "> DELETE {<" + concept1 + "> <" + namespaces.SKOS + "related> <" + concept2 + ">;<"+ namespaces.DC_TERMS+"modified>[].<" + concept2 + "> <" + namespaces.SKOS + "topConceptOf> <" + concept1 + ">;<"+ namespaces.DC_TERMS+"modified>[]} INSERT {<" + concept1 + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.<" + concept2 + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
+            var query = "WITH <" + graph + "> DELETE {<" + concept1 + "> <" + namespaces.SKOS + "related> <" + concept2 + ">;<"+ namespaces.DC_TERMS+"modified>?_mod1.<" + concept2 + "> <" + namespaces.SKOS + "topConceptOf> <" + concept1 + ">;<"+ namespaces.DC_TERMS+"modified>?_mod2} INSERT {<" + concept1 + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>.<" + concept2 + "><"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>} WHERE {}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         },
@@ -252,13 +252,13 @@ function SKOSClient(options) {
         },
         scheme : function(graph,uri,onsuccess, onfailure) {
             var language = OPTIONS.LANGUAGE=='none'?"":OPTIONS.LANGUAGE;
-            var query = "SELECT DISTINCT ?title ?children {GRAPH <" + graph + "> {OPTIONAL { <"+uri+"> <" + namespaces.RDFS + "label> ?title. FILTER (lang(?title) = '" + language + "') }BIND ( EXISTS { <"+uri+">  <" + namespaces.SKOS + "hasTopConcept> [] } AS ?children )}}";
+            var query = "SELECT DISTINCT ?title ?children {GRAPH <" + graph + "> {OPTIONAL { <"+uri+"> <" + namespaces.RDFS + "label> ?title. FILTER (lang(?title) = '" + language + "') }BIND ( EXISTS { <"+uri+">  <" + namespaces.SKOS + "hasTopConcept> ?_top } AS ?children )}}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.select(query, onsuccess, onfailure)
         },
         concept : function(graph, uri, onsuccess, onfailure) {
             var language = OPTIONS.LANGUAGE=='none'?"":OPTIONS.LANGUAGE;
-            var query = "SELECT DISTINCT ?title ?children {GRAPH <" + graph + "> {OPTIONAL { <"+uri+"> <" + namespaces.SKOS + "prefLabel> ?title . FILTER (lang(?title) = '" + language + "') }BIND ( EXISTS { <"+uri+">  <" + namespaces.SKOS + "narrower> [] } AS ?children )}}";
+            var query = "SELECT DISTINCT ?title ?children {GRAPH <" + graph + "> {OPTIONAL { <"+uri+"> <" + namespaces.SKOS + "prefLabel> ?title . FILTER (lang(?title) = '" + language + "') }BIND ( EXISTS { <"+uri+">  <" + namespaces.SKOS + "narrower> ?_narrow } AS ?children )}}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.select(query, onsuccess, onfailure)
         },
@@ -279,19 +279,19 @@ function SKOSClient(options) {
         },
         schemes : function(graph, onsuccess, onfailure) {
             var language = OPTIONS.LANGUAGE=='none'?"":OPTIONS.LANGUAGE;
-            var query = "SELECT DISTINCT ?uri ?title ?children {GRAPH <" + graph + "> {?uri a <" + namespaces.SKOS + "ConceptScheme>.OPTIONAL { ?uri <" + namespaces.RDFS + "label> ?title. FILTER (lang(?title) = '" + language + "') }BIND ( EXISTS { ?uri <" + namespaces.SKOS + "hasTopConcept> [] } AS ?children )}}";
+            var query = "SELECT DISTINCT ?uri ?title ?children {GRAPH <" + graph + "> {?uri a <" + namespaces.SKOS + "ConceptScheme>.OPTIONAL { ?uri <" + namespaces.RDFS + "label> ?title. FILTER (lang(?title) = '" + language + "') }BIND ( EXISTS { ?uri <" + namespaces.SKOS + "hasTopConcept> ?_top } AS ?children )}}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.select(query, onsuccess, onfailure)
         },
         top_concepts : function(graph, scheme, onsuccess, onfailure) {
             var language = OPTIONS.LANGUAGE=='none'?"":OPTIONS.LANGUAGE;
-            var query = "SELECT DISTINCT ?uri ?title ?children {GRAPH <" + graph + ">  {<" + scheme + "> <" + namespaces.SKOS + "hasTopConcept> ?uri.OPTIONAL { ?uri <" + namespaces.SKOS + "prefLabel> ?title . FILTER (lang(?title) = '" + language + "') }BIND ( EXISTS { ?uri <" + namespaces.SKOS + "narrower> [] } AS ?children )}}";
+            var query = "SELECT DISTINCT ?uri ?title ?children {GRAPH <" + graph + ">  {<" + scheme + "> <" + namespaces.SKOS + "hasTopConcept> ?uri.OPTIONAL { ?uri <" + namespaces.SKOS + "prefLabel> ?title . FILTER (lang(?title) = '" + language + "') }BIND ( EXISTS { ?uri <" + namespaces.SKOS + "narrower> ?_narrow } AS ?children )}}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.select(query, onsuccess, onfailure)
         },
         narrower : function(graph, concept, onsuccess, onfailure) {
             var language = OPTIONS.LANGUAGE=='none'?"":OPTIONS.LANGUAGE;
-            var query = "SELECT DISTINCT ?uri ?title ?children {GRAPH <" + graph + "> {<" + concept + "> <" + namespaces.SKOS + "narrower> ?uri.OPTIONAL { ?uri <" + namespaces.SKOS + "prefLabel> ?title . FILTER (lang(?title) = '" + language + "') }BIND ( EXISTS { ?uri <" + namespaces.SKOS + "narrower> [] } AS ?children )}}";
+            var query = "SELECT DISTINCT ?uri ?title ?children {GRAPH <" + graph + "> {<" + concept + "> <" + namespaces.SKOS + "narrower> ?uri.OPTIONAL { ?uri <" + namespaces.SKOS + "prefLabel> ?title . FILTER (lang(?title) = '" + language + "') }BIND ( EXISTS { ?uri <" + namespaces.SKOS + "narrower> ?_narrow } AS ?children )}}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.select(query, onsuccess, onfailure)
         },
@@ -308,7 +308,7 @@ function SKOSClient(options) {
         },
         freeConcepts : function(graph,onsuccess, onfailure) {
             var language = OPTIONS.LANGUAGE=='none'?"":OPTIONS.LANGUAGE;
-            var query = "SELECT ?uri ?title ?children WHERE {GRAPH <"+graph+"> {?uri <"+namespaces.RDF+"type> <"+namespaces.SKOS+"Concept>. FILTER NOT EXISTS {[] <"+namespaces.SKOS+"narrower> ?uri}. FILTER NOT EXISTS {[] <"+namespaces.SKOS+"hasTopConcept> ?uri}.OPTIONAL{ ?uri <"+namespaces.SKOS+"prefLabel> ?title.FILTER(lang(?title)='"+language+"')}BIND(EXISTS {?uri <"+namespaces.SKOS+"narrower> []} AS ?children)}}"
+            var query = "SELECT ?uri ?title ?children WHERE {GRAPH <"+graph+"> {?uri <"+namespaces.RDF+"type> <"+namespaces.SKOS+"Concept>. FILTER NOT EXISTS {?_sub1 <"+namespaces.SKOS+"narrower> ?uri}. FILTER NOT EXISTS {?_sub2 <"+namespaces.SKOS+"hasTopConcept> ?uri}.OPTIONAL{ ?uri <"+namespaces.SKOS+"prefLabel> ?title.FILTER(lang(?title)='"+language+"')}BIND(EXISTS {?uri <"+namespaces.SKOS+"narrower> ?_narrow} AS ?children)}}"
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.select(query, onsuccess, onfailure);
         },
@@ -327,7 +327,7 @@ function SKOSClient(options) {
     this.search = {
         suggestion : function(graph, text, limit, case_sensitive, onsuccess, onfailure) {
             var language = OPTIONS.LANGUAGE=='none'?"":OPTIONS.LANGUAGE;
-            var query = "Select DISTINCT ?uri ?text ?scheme {GRAPH<" + graph + "> {?uri <" + namespaces.RDF + "type> <" + namespaces.SKOS + "Concept>;<" + namespaces.SKOS + "prefLabel> ?text.OPTIONAL{?uri <"+namespaces.SKOS+"inScheme> ?scheme_uri. ?scheme_uri <"+namespaces.RDFS+"label> ?scheme.FILTER (lang(?scheme) = '" + language + "') }FILTER (regex(str(?text), \"" + text + "\" " + (case_sensitive ? "" : ",\"i\"") + ")).FILTER (lang(?text) = '" + language + "')}} LIMIT " + limit;
+            var query = "Select DISTINCT ?uri ?text ?scheme {GRAPH<" + graph + "> {?uri <" + namespaces.RDF + "type> <" + namespaces.SKOS + "Concept>;<" + namespaces.SKOS + "prefLabel> ?text.OPTIONAL{?uri <" + namespaces.SKOS + "altLabel> ?alt_text.}OPTIONAL{?uri <"+namespaces.SKOS+"inScheme> ?scheme_uri. ?scheme_uri <"+namespaces.RDFS+"label> ?scheme.FILTER (lang(?scheme) = '" + language + "') }FILTER (regex(str(?text), \"" + text + "\" " + (case_sensitive ? "" : ",\"i\"") + ")||regex(str(?alt_text), \"" + text + "\" " + (case_sensitive ? "" : ",\"i\"") + ")).FILTER (lang(?text) = '" + language + "')}} LIMIT " + limit;
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.select(query, onsuccess, onfailure);
         }
