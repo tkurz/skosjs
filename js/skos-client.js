@@ -327,7 +327,7 @@ function SKOSClient(options) {
     this.search = {
         suggestion : function(graph, text, limit, case_sensitive, onsuccess, onfailure) {
             var language = OPTIONS.LANGUAGE=='none'?"":OPTIONS.LANGUAGE;
-            var query = "Select DISTINCT ?uri ?text ?scheme {GRAPH<" + graph + "> {?uri <" + namespaces.RDF + "type> <" + namespaces.SKOS + "Concept>;<" + namespaces.SKOS + "prefLabel> ?text.OPTIONAL{?uri <"+namespaces.SKOS+"inScheme> ?scheme_uri. ?scheme_uri <"+namespaces.RDFS+"label> ?scheme.FILTER (lang(?scheme) = '" + language + "') }FILTER (regex(str(?text), \"" + text + "\" " + (case_sensitive ? "" : ",\"i\"") + ")).FILTER (lang(?text) = '" + language + "')}} LIMIT " + limit;
+            var query = "Select DISTINCT ?uri ?text ?scheme {GRAPH<" + graph + "> {?uri <" + namespaces.RDF + "type> <" + namespaces.SKOS + "Concept>;<" + namespaces.SKOS + "prefLabel> ?text.OPTIONAL{?uri <" + namespaces.SKOS + "altLabel> ?alt_text.}OPTIONAL{?uri <"+namespaces.SKOS+"inScheme> ?scheme_uri. ?scheme_uri <"+namespaces.RDFS+"label> ?scheme.FILTER (lang(?scheme) = '" + language + "') }FILTER (regex(str(?text), \"" + text + "\" " + (case_sensitive ? "" : ",\"i\"") + ")||regex(str(?alt_text), \"" + text + "\" " + (case_sensitive ? "" : ",\"i\"") + ")).FILTER (lang(?text) = '" + language + "')}} LIMIT " + limit;
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.select(query, onsuccess, onfailure);
         }
