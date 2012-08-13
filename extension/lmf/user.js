@@ -24,14 +24,14 @@ function UserService(editor, host) {
             var self = this;
             function handleUpdate(event) {
                 var uris = event.data.uris;
-                var prop = "http://purl.org/dc/elements/1.1/contributor";
+                var prop = "http://purl.org/dc/terms/contributor";
                 update(self, uris, prop, false, function() {
                     self.editor.event.fire(editor.EventCode.VIEW.RELOAD, {uris: [prop]});
                 });
             }
             function handleCreate(event) {
                 var uris = event.data.uri;
-                var prop = "http://purl.org/dc/elements/1.1/creator";
+                var prop = "http://purl.org/dc/terms/creator";
                 update(self, uris, prop, true, function() {
                     self.editor.event.fire(editor.EventCode.VIEW.RELOAD, {uris: [prop]});
                 });

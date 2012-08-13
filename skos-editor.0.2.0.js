@@ -35,15 +35,15 @@ function SKOSEditor(options) {
     var PROPERTIES = {
         graph : {
             left:[
-                {title:"Title",property:"http://purl.org/dc/elements/1.1/title",type:"string",multivalue:false,multilingual:false,editable:true},
-                {title:"Subject",property:"http://purl.org/dc/elements/1.1/subject",type:"string",multivalue:false,multilingual:true,editable:true},
-                {title:"Description",property:"http://purl.org/dc/elements/1.1/description",type:"text",multivalue:false,multilingual:true,editable:true}
+                {title:"Title",property:"http://purl.org/dc/terms/title",type:"string",multivalue:false,multilingual:false,editable:true},
+                {title:"Subject",property:"http://purl.org/dc/terms/subject",type:"string",multivalue:false,multilingual:true,editable:true},
+                {title:"Description",property:"http://purl.org/dc/terms/description",type:"text",multivalue:false,multilingual:true,editable:true}
             ],
             right:[
-                {title:"Author",property:"http://purl.org/dc/elements/1.1/creator",type:"uri",multivalue:false,multilingual:false,editable:false},
+                {title:"Author",property:"http://purl.org/dc/terms/creator",type:"uri",multivalue:false,multilingual:false,editable:false},
                 {title:"Created",property:"http://purl.org/dc/terms/created",type:"string",multivalue:false,multilingual:false,editable:false},
-                {title:"Publisher (Organisation)",property:"http://purl.org/dc/elements/1.1/publisher",type:"string",multivalue:true,multilingual:false,editable:true},
-                {title:"Contributors",property:"http://purl.org/dc/elements/1.1/contributor",type:"uri",multivalue:true,multilingual:false,editable:false}
+                {title:"Publisher (Organisation)",property:"http://purl.org/dc/terms/publisher",type:"string",multivalue:true,multilingual:false,editable:true},
+                {title:"Contributors",property:"http://purl.org/dc/terms/contributor",type:"uri",multivalue:true,multilingual:false,editable:false}
             ]
         },
         scheme : {
@@ -52,12 +52,12 @@ function SKOSEditor(options) {
             ],
             right:[
                 {title:"Title",property:"http://www.w3.org/2000/01/rdf-schema#label",type:"string",multivalue:false,multilingual:true,editable:true},
-                {title:"Description",property:"http://purl.org/dc/elements/1.1/description",type:"text",multivalue:false,multilingual:true,editable:true},
-                {title:"Author",property:"http://purl.org/dc/elements/1.1/creator",type:"uri",multivalue:false,multilingual:false,editable:false},
+                {title:"Description",property:"http://purl.org/dc/terms/description",type:"text",multivalue:false,multilingual:true,editable:true},
+                {title:"Author",property:"http://purl.org/dc/terms/creator",type:"uri",multivalue:false,multilingual:false,editable:false},
                 {title:"Created",property:"http://purl.org/dc/terms/created",type:"string",multivalue:false,multilingual:false,editable:false},
                 {title:"Modified",property:"http://purl.org/dc/terms/modified",type:"string",multivalue:false,multilingual:false,editable:false},
-                {title:"Publisher (Organisation)",property:"http://purl.org/dc/elements/1.1/publisher",type:"string",multivalue:true,multilingual:false,editable:true},
-                {title:"Contributors",property:"http://purl.org/dc/elements/1.1/contributor",type:"uri",multivalue:true,multilingual:false,editable:false},
+                {title:"Publisher (Organisation)",property:"http://purl.org/dc/terms/publisher",type:"string",multivalue:true,multilingual:false,editable:true},
+                {title:"Contributors",property:"http://purl.org/dc/terms/contributor",type:"uri",multivalue:true,multilingual:false,editable:false},
                 {title:"License",property:"http://purl.org/dc/terms/license",type:"uri",multivalue:true,droppable:false,editable:true}
             ]
         },
@@ -75,10 +75,10 @@ function SKOSEditor(options) {
                 {title:"Preferred Label",property:"http://www.w3.org/2004/02/skos/core#prefLabel",type:"string",multivalue:false,multilingual:true,editable:true},
                 {title:"Alternative Label",property:"http://www.w3.org/2004/02/skos/core#altLabel",type:"string",multivalue:true,multilingual:true,editable:true},
                 {title:"Hidden Label",property:"http://www.w3.org/2004/02/skos/core#hiddenLabel",type:"string",multivalue:true,multilingual:true,editable:true},
-                {title:"Author",property:"http://purl.org/dc/elements/1.1/creator",type:"uri",multivalue:false,multilingual:false,editable:false},
+                {title:"Author",property:"http://purl.org/dc/terms/creator",type:"uri",multivalue:false,multilingual:false,editable:false},
                 {title:"Created",property:"http://purl.org/dc/terms/created",type:"string",multivalue:false,multilingual:false,editable:false},
                 {title:"Modified",property:"http://purl.org/dc/terms/modified",type:"string",multivalue:false,multilingual:false,editable:false},
-                {title:"Contributors",property:"http://purl.org/dc/elements/1.1/contributor",type:"uri",multivalue:true,multilingual:false,editable:false},
+                {title:"Contributors",property:"http://purl.org/dc/terms/contributor",type:"uri",multivalue:true,multilingual:false,editable:false},
                 {title:"Definition",property:"http://www.w3.org/2004/02/skos/core#definition",type:"text",multivalue:false,multilingual:true,editable:true},
                 {title:"Hidden Label",property:"http://www.w3.org/2004/02/skos/core#hiddenLabel",type:"string",multivalue:true,multilingual:true,editable:true}
             ]
@@ -486,7 +486,7 @@ function SKOSEditor(options) {
                 if(event.data.property=="http://www.w3.org/2004/02/skos/core#prefLabel" || event.data.property=="http://www.w3.org/2000/01/rdf-schema#label") {
                     $(".concept_"+event.data.uri.md5()).text(event.data.value);
                 }
-            } else if(event.data.property=="http://purl.org/dc/elements/1.1/title") {
+            } else if(event.data.property=="http://purl.org/dc/terms/title") {
                $(".concept_"+event.data.uri.md5()).text(event.data.value);
             }
         });
@@ -495,7 +495,7 @@ function SKOSEditor(options) {
                 if(event.data.property=="http://www.w3.org/2004/02/skos/core#prefLabel" || event.data.property=="http://www.w3.org/2000/01/rdf-schema#label") {
                     $(".concept_"+event.data.uri.md5()).text(event.data.uri);
                 }
-            } else if(event.data.property=="http://purl.org/dc/elements/1.1/title") {
+            } else if(event.data.property=="http://purl.org/dc/terms/title") {
                $(".concept_"+event.data.uri.md5()).text(event.data.value);
             }
         });
@@ -504,7 +504,7 @@ function SKOSEditor(options) {
                 if(event.data.property=="http://www.w3.org/2004/02/skos/core#prefLabel" || event.data.property=="http://www.w3.org/2000/01/rdf-schema#label") {
                     $(".concept_"+event.data.uri.md5()).text(event.data.value);
                 }
-            }  else if(event.data.property=="http://purl.org/dc/elements/1.1/title") {
+            }  else if(event.data.property=="http://purl.org/dc/terms/title") {
                $(".concept_"+event.data.uri.md5()).text(event.data.value);
             }
         });
