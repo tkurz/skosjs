@@ -31,7 +31,6 @@ function SKOSClient(options) {
         SKOS : "http://www.w3.org/2004/02/skos/core#",
         RDF : "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
         RDFS: "http://www.w3.org/2000/01/rdf-schema#",
-        DC : "http://purl.org/dc/elements/1.1/",
         DC_TERMS : "http://purl.org/dc/terms/",
         SKOSJS : "http://tkurz.github.com/skosjs/ns/2012/03/"
     }
@@ -69,7 +68,7 @@ function SKOSClient(options) {
                 var query1 = "CREATE GRAPH<" + uri + ">";
                 if(OPTIONS.DEBUG)console.debug(query1);
                 sparqlClient.update(query1, function(){
-                    var query2 = "INSERT DATA {GRAPH <" + uri + "> {<" + uri + "> <" + namespaces.DC + "title>\"" + title + "\";<"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project>;<"+ namespaces.DC_TERMS+"created>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>. }}";
+                    var query2 = "INSERT DATA {GRAPH <" + uri + "> {<" + uri + "> <" + namespaces.DC_TERMS + "title>\"" + title + "\";<"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project>;<"+ namespaces.DC_TERMS+"created>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>;<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#date>. }}";
                     if(OPTIONS.DEBUG)console.debug(query2);
                     sparqlClient.update(query2, onsuccess, onfailure);
                 }, onfailure);
@@ -246,7 +245,7 @@ function SKOSClient(options) {
         graph : function(graph,onsuccess, onfailure) {
             var language = "";
 
-            var query = "SELECT DISTINCT ?title WHERE { {GRAPH <"+graph+"> { <"+graph+"> <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project> }}UNION {GRAPH <"+graph+"> { ?a <"+ namespaces.RDF +"type><" + namespaces.SKOS + "Concept> }}OPTIONAL {<"+graph+"> <" + namespaces.DC + "title> ?title.FILTER (lang(?title) = '" + language + "')}}";
+            var query = "SELECT DISTINCT ?title WHERE { {GRAPH <"+graph+"> { <"+graph+"> <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project> }}UNION {GRAPH <"+graph+"> { ?a <"+ namespaces.RDF +"type><" + namespaces.SKOS + "Concept> }}OPTIONAL {<"+graph+"> <" + namespaces.DC_TERMS + "title> ?title.FILTER (lang(?title) = '" + language + "')}}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.select(query, onsuccess, onfailure);
         },
@@ -272,8 +271,8 @@ function SKOSClient(options) {
     this.list = {
         graphs : function(onsuccess, onfailure) {
             var language = OPTIONS.LANGUAGE=='none'?"":OPTIONS.LANGUAGE;
-            //var query = "SELECT DISTINCT ?uri ?title {GRAPH ?uri{?uri <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project>. Optional {?uri <" + namespaces.DC + "title> ?title. FILTER (lang(?title) = '" + language + "')}}}";
-            var query = "SELECT DISTINCT ?uri ?title WHERE { {GRAPH ?uri { ?uri <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project> }}UNION {GRAPH ?uri { ?a <"+ namespaces.RDF +"type><" + namespaces.SKOS + "Concept> }}OPTIONAL {?uri <" + namespaces.DC + "title> ?title.FILTER (lang(?title) = '')}}";
+            //var query = "SELECT DISTINCT ?uri ?title {GRAPH ?uri{?uri <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project>. Optional {?uri <" + namespaces.DC_TERMS + "title> ?title. FILTER (lang(?title) = '" + language + "')}}}";
+            var query = "SELECT DISTINCT ?uri ?title WHERE { {GRAPH ?uri { ?uri <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project> }}UNION {GRAPH ?uri { ?a <"+ namespaces.RDF +"type><" + namespaces.SKOS + "Concept> }}OPTIONAL {?uri <" + namespaces.DC_TERMS + "title> ?title.FILTER (lang(?title) = '')}}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.select(query, onsuccess, onfailure);
         },
