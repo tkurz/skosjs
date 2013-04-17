@@ -6,7 +6,7 @@
 function SparqlClient(endpointSelect, endpointUpdate) {
 
     this.select = function(query, onsuccess, onfailure) {
-        $.getJSON(endpointSelect+"?query="+encodeURIComponent(query)+"&output=json",onsuccess(data.results.bindings))
+        $.getJSON(endpointSelect+"?query="+encodeURIComponent(query)+"&output=json")
             .done(function(data){
                 onsuccess(data.results.bindings);
             })
@@ -16,9 +16,9 @@ function SparqlClient(endpointSelect, endpointUpdate) {
     }
 
     this.ask = function(query, onsuccess, onfailure) {
-        $.getJSON(endpointSelect+"?query="+encodeURIComponent(query)+"&output=json",onsuccess(data.results.bindings))
+        $.getJSON(endpointSelect+"?query="+encodeURIComponent(query)+"&output=json")
             .done(function(data){
-                onsuccess(data.boolean == 'true');
+                onsuccess(data.boolean ? data.boolean : data.boolean == 'true');
             })
             .fail(function(){
                 onfailure();
@@ -26,7 +26,7 @@ function SparqlClient(endpointSelect, endpointUpdate) {
     }
 
     this.update = function(query, onsuccess, onfailure) {
-        $.post(endpointUpdate+"?update="+encodeURIComponent(query)+"&output=json",onsuccess(data.results.bindings))
+        $.post(endpointUpdate+"?query="+encodeURIComponent(query)+"&output=json")
             .done(function(){
                 onsuccess();
             })

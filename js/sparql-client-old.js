@@ -30,7 +30,8 @@ function SparqlClient(endpointSelect, endpointUpdate) {
     this.ask = function(query, onsuccess, onfailure) {
         HTTP.get(endpointSelect, {query:encodeURIComponent(query)}, null, "application/sparql-results+json", {
             200:function(data) {
-                if (onsuccess)onsuccess(JSON.parse(data).boolean == 'true')
+                var value = JSON.parse(data).boolean;
+                if (onsuccess)onsuccess(value ? value : value == 'true');
             },
             "default":function(err) {
                 if (onfailure)onfailure(err)

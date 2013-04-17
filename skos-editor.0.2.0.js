@@ -941,6 +941,7 @@ function SKOSEditor(options) {
                 popups.info("Info", "select a graph first");
             }
             var text = input_field.val();
+
             if (text.length >= minLenght) {
                 //return
                 if (e.keyCode == 13) {
@@ -2067,7 +2068,7 @@ function SKOSEditor(options) {
             var timeout;
 
             $("#"+background).show();
-            $("#" + container).load("skosjs/html/settings.html", function() {
+            $("#" + container).load("html/settings.html", function() {
                 $(".popup_cancel").click(function() {
                     clearTimeout(timeout);
                     close();

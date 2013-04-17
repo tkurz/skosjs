@@ -22,9 +22,9 @@ function SimpleExtension(editor) {
             popup = editor.popup.custom("Simple Extension");
 
             var text = "No graph selected";
-            if(graph) text = "Selected " + graph.uri;
+            if(graph) text = "Graph: " + graph;
 
-            popup.setContent($("<h1></h1>").text(text));
+            popup.setContent($("<p></p>").text(text));
 
             popup.open();
         }
@@ -34,12 +34,13 @@ function SimpleExtension(editor) {
 
         editor.menu.createSeperator("Project");
         editor.menu.createMenuItem("Project","Extension",function(){
-            new Popup();
+            var popup = new Popup();
+            popup.open();
         });
 
         //bindings
         editor.event.bind(editor.EventCode.GRAPH.LOAD,function(event){
-            graph = event.graph.uri;
+            graph = event.data.uri;
         });
     }
 
