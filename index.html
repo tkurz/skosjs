@@ -1,60 +1,69 @@
 <!--
-  ~ Copyright (c) 2012 Salzburg Research.
-  ~
-  ~ Licensed under the Apache License, Version 2.0 (the "License");
-  ~ you may not use this file except in compliance with the License.
-  ~ You may obtain a copy of the License at
-  ~
-  ~     http://www.apache.org/licenses/LICENSE-2.0
-  ~
-  ~ Unless required by applicable law or agreed to in writing, software
-  ~ distributed under the License is distributed on an "AS IS" BASIS,
-  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  ~ See the License for the specific language governing permissions and
-  ~ limitations under the License.
-  -->
 
+    Copyright (C) 2013 Salzburg Research.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+         http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
         "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
     <title>SKOSjs Thesaurus Manager</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- TODO -->
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="lib/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="js/md5.js"></script>
-    <script type="text/javascript" src="js/sparql-client.js"></script>
+    <script type="text/javascript" src="js/sparql-client-old.js"></script>
     <script type="text/javascript" src="js/skos-client.js"></script>
-    <script type="text/javascript" src="extension/lmf/ioservice.js"></script>
-    <script type="text/javascript" src="extension/lmf/user.js"></script>
+    <script type="text/javascript" src="extension/simple/SimpleExtension.js"></script>
     <script type="text/javascript" src="js/templates.js"></script>
     <script type="text/javascript" src="skos-editor.0.2.0.js"></script>
+
     <script type="text/javascript">
 
-        var BASE = "http://labs.newmedialab.at/SKOS/"
+        var HOST = "http://localhost:3030/ds/";
+
         var OPTIONS = {
             RDF_LINK : function(uri){showRDF(uri)},
-            BASE_URI : BASE+"resource/",
+            BASE_URI : HOST+"resource/",
             LANGUAGES_SUPPORTED : ["en","de"],
-            ENDPOINT_SELECT : BASE+"sparql/select",
-            ENDPOINT_UPDATE : BASE+"sparql/update",
+            ENDPOINT_SELECT : HOST+"query",
+            ENDPOINT_UPDATE : HOST+"update",
             LANGUAGE : "en",
-            DEBUG : false
+            DEBUG : false,
+            LABEL_SCHEME : "http://www.w3.org/2004/02/skos/core#prefLabel"
         }
 
         $(document).ready(function(){
+
             var editor = new SKOSEditor(OPTIONS);
-            //importer
-            var ioservice = new IOService(editor,BASE);
-            var user = new UserService(editor, BASE);
+
+            var extension = new SimpleExtension(editor);
+
+            /**
+            editor.properties.remove("scheme","http://www.w3.org/2000/01/rdf-schema#label");
+            editor.properties.add("scheme","http://www.w3.org/2004/02/skos/core#prefLabel",{title:"Label",type:"string",multivalue:false,multilingual:true,editable:true},"right",0);
+            editor.properties.alter("scheme","http://purl.org/dc/terms/license",{title:"Licence String",type:"string"});
+            **/
 
             editor.init();
         });
 
         function showRDF(uri){
-             window.open(BASE+"meta/text/html?uri="+encodeURIComponent(uri));
+            window.open(HOST+"sparql/select?query="+encodeURIComponent("CONSTRUCT{?s ?p ?o}WHERE{?s ?p ?o.FILTER(?s=<"+uri+">)}"));
         }
-
     </script>
     <link type="text/css" rel="stylesheet" href="css/font-awesome.css">
     <link type="text/css" rel="stylesheet" href="css/basic.css">
@@ -66,7 +75,11 @@
     <link type="text/css" rel="stylesheet" href="css/popups.css">
 </head>
 <body>
-<div id="header1"></div>
+<div id="header1">
+    <div id="topnav">
+        <div id="login"></div>
+    </div>
+</div>
 <div id="header2"></div>
 <div id="header3">
     <div id="menu"></div>
