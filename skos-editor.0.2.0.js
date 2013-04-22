@@ -145,8 +145,10 @@ function SKOSEditor(options) {
 
     //settings (graph dependent)
     var settings = new Settings();
+    //server interaction
+    var client = new SparqlClient(OPTIONS.ENDPOINT_SELECT,OPTIONS.ENDPOINT_UPDATE);
     //skos interaction
-    var skos = new SKOSClient({LANGUAGE:settings.getLanguage(),DEBUG:OPTIONS.DEBUG,ENDPOINT_SELECT:OPTIONS.ENDPOINT_SELECT,ENDPOINT_UPDATE:OPTIONS.ENDPOINT_UPDATE,LABEL_GRAPH :OPTIONS.LABEL_GRAPH,LABEL_SCHEME :OPTIONS.LABEL_SCHEME});
+    var skos = new SKOSClient(client, {LANGUAGE:settings.getLanguage(),DEBUG:OPTIONS.DEBUG,ENDPOINT_SELECT:OPTIONS.ENDPOINT_SELECT,ENDPOINT_UPDATE:OPTIONS.ENDPOINT_UPDATE,LABEL_GRAPH :OPTIONS.LABEL_GRAPH,LABEL_SCHEME :OPTIONS.LABEL_SCHEME});
 
     //create views
     var menu = new Menu('menu');
@@ -246,6 +248,11 @@ function SKOSEditor(options) {
         EventCode : EventCode,
         init : function() {
             init();
+        },
+        authentification: {
+            setAuthToken : function(token) {
+                client.setAuthToken(token);
+            }
         }
     }
     return return_object;

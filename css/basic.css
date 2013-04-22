@@ -110,3 +110,14 @@ body {
     min-height: 300px;
     background-color:white;
 }
+
+#login {
+    text-align: right;
+    font-size: 12px;
+    padding-right: 10px;
+    padding-top: 35px;
+}
+
+#login a {
+    cursor: pointer;
+}

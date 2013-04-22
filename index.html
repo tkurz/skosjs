@@ -25,25 +25,25 @@
     <!-- TODO -->
     <script type="text/javascript" src="lib/jquery-1.9.1.min.js"></script>
     <script type="text/javascript" src="js/md5.js"></script>
-    <script type="text/javascript" src="js/sparql-client-old.js"></script>
+    <script type="text/javascript" src="js/sparql-client.js"></script>
     <script type="text/javascript" src="js/skos-client.js"></script>
     <script type="text/javascript" src="extension/simple/SimpleExtension.js"></script>
+    <script type="text/javascript" src="extension/auth/AuthTokenExtension.js"></script>
     <script type="text/javascript" src="js/templates.js"></script>
     <script type="text/javascript" src="skos-editor.0.2.0.js"></script>
 
     <script type="text/javascript">
 
-        var HOST = "http://localhost:3030/ds/";
+        var HOST = "http://localhost:8080/sparql/";
 
         var OPTIONS = {
             RDF_LINK : function(uri){showRDF(uri)},
             BASE_URI : HOST+"resource/",
             LANGUAGES_SUPPORTED : ["en","de"],
-            ENDPOINT_SELECT : HOST+"query",
+            ENDPOINT_SELECT : HOST+"select",
             ENDPOINT_UPDATE : HOST+"update",
             LANGUAGE : "en",
-            DEBUG : false,
-            LABEL_SCHEME : "http://www.w3.org/2004/02/skos/core#prefLabel"
+            DEBUG : false
         }
 
         $(document).ready(function(){
@@ -51,6 +51,8 @@
             var editor = new SKOSEditor(OPTIONS);
 
             var extension = new SimpleExtension(editor);
+
+            var authTokenExtension = new AuthTokenExtension(editor,"#login");
 
             /**
             editor.properties.remove("scheme","http://www.w3.org/2000/01/rdf-schema#label");
