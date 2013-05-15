@@ -63,7 +63,7 @@ function AuthTokenExtension(editor,container) {
     //bindings and init
     function Extension() {
         //bindings
-        editor.event.bind(editor.EventCode.GRAPH.LOAD,function(event){
+        editor.event.bind(editor.EventCode.GRAPH.LOAD,function(event) {
             graph = event.data;
         });
         createLogin();

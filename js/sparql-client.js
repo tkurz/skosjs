@@ -89,6 +89,7 @@ function HTTP_Client() {
     function buildQueryParms(params) {
         if (params == null || params.length == 0) return "";
         var s = "?"
+        if(auth_token != undefined) s += "auth_token=" + auth_token + "&";
         for (prop in params) {
             s += prop + "=" + params[prop] + "&";
         }
@@ -99,7 +100,6 @@ function HTTP_Client() {
     function doRequest(method, path, queryParams, data, mimetype, callbacks) {
         mimetype = mimetype || "application/json;charset=UTF-8";
         var _url = path + buildQueryParms(queryParams);
-        if(auth_token != undefined) _url += "&auth_token=" + auth_token;
         var request = createRequest();
         request.onreadystatechange = function() {
             if (request.readyState == 4) {
