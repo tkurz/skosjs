@@ -496,22 +496,17 @@ function SKOSEditor(options) {
         });
 
         function setShortcuts() {
-            $(window).keypress(function(event) {
+            $(window).keydown(function(event) {
                 if(event.ctrlKey) {
                     switch(event.which) {
-                        case 103://G
+                        case 71://G
                             events.fire(new Event(EventCode.GRAPH.CREATE));
                             event.preventDefault();
                             break;
-                        case 110://N
+                        case 78://N
                             if(!new_concept.hasClass("disabled"))events.fire(new Event(EventCode.CONCEPT.CREATE,current));
                             event.preventDefault();
                             break;
-                        /*case 115://S
-                         events.fire(new Event(EventCode.GRAPH.CREATE));
-                         event.preventDefault();
-                         break;
-                         */
                     }
                 }
             });
