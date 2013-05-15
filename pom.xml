@@ -21,6 +21,12 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>at.newmedialab.lmf</groupId>
+        <artifactId>lmf-parent</artifactId>
+        <version>3.1.0-SNAPSHOT</version>
+    </parent>
+
     <groupId>at.salzburgresearch.skosjs</groupId>
     <artifactId>skosjs-webjar</artifactId>
     <version>0.2.0-SNAPSHOT</version>
