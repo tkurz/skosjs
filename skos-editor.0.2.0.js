@@ -605,7 +605,7 @@ function SKOSEditor(options) {
 
             var loading = false;
 
-            $(window).keydown(function(event) {console.log(event.which);
+            $(window).keydown(function(event) {
                 if(graph && event.target.id!="search_input" && $(".concept_"+current.uri.md5()).length>0) {
                     switch(event.keyCode) {
                         //37 l 38 o 39 r 40 u 13 enter
@@ -2255,5 +2255,5 @@ String.random = function (string_length) {
     return randomstring;
 }
 String.prototype.bool = function() { return (/^true$/i).test(this);};
-String.prototype.n3escape = function() {return this.replace(/(\r\n|\n|\r)/gm,"\\n");}
+String.prototype.n3escape = function() {console.log(1);return this.replace(/(\r\n|\n|\r)/gm,"\\n");}
 String.prototype.n3escapeToHMTL = function() {return this.replace(/(\r\n|\n|\r)/gm,"<br/>");}

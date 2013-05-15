@@ -34,7 +34,7 @@ function SparqlClient(endpointSelect, endpointUpdate) {
      * @param onfailure
      */
     this.ask = function(query, onsuccess, onfailure) {
-        HTTP.get(endpointSelect, {query:encodeURIComponent(query)}, null, "application/sparql-results+json", {
+        HTTP.get(endpointSelect, {query:encodeURIComponent(query)}, null, "application/sparql-results+json;charset=UTF-8", {
             200:function(data) {
                 var value = JSON.parse(data).boolean;
                 if (onsuccess)onsuccess(String(value) == 'true' ? true : false);
@@ -51,7 +51,7 @@ function SparqlClient(endpointSelect, endpointUpdate) {
      * @param onfailure
      */
     this.update = function(query, onsuccess, onfailure) {
-        HTTP.post(endpointUpdate, null, query, "application/sparql-update", {
+        HTTP.post(endpointUpdate, null, query, "application/sparql-update;charset=UTF-8", {
             200:function() {
                 if (onsuccess)onsuccess()
             },
@@ -97,7 +97,7 @@ function HTTP_Client() {
 
     //fire request, the method takes a callback object which can contain several callback functions for different HTTP Response codes
     function doRequest(method, path, queryParams, data, mimetype, callbacks) {
-        mimetype = mimetype || "application/json";
+        mimetype = mimetype || "application/json;charset=UTF-8";
         var _url = path + buildQueryParms(queryParams);
         if(auth_token != undefined) _url += "&auth_token=" + auth_token;
         var request = createRequest();
@@ -115,6 +115,7 @@ function HTTP_Client() {
         request.open(method, _url, true);
         if (method == "PUT" || method == "POST")request.setRequestHeader("Content-Type", mimetype);
         if (method == "GET")request.setRequestHeader("Accept", mimetype);
+        console.log(data);
         request.send(data);
     }
 
