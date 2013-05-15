@@ -34,14 +34,14 @@
 
     <script type="text/javascript">
 
-        var HOST = "http://localhost:8080/sparql/";
+        var HOST = "http://localhost:8080/";
 
         var OPTIONS = {
             RDF_LINK : function(uri){showRDF(uri)},
             BASE_URI : HOST+"resource/",
             LANGUAGES_SUPPORTED : ["en","de"],
-            ENDPOINT_SELECT : HOST+"select",
-            ENDPOINT_UPDATE : HOST+"update",
+            ENDPOINT_SELECT : HOST+"sparql/select",
+            ENDPOINT_UPDATE : HOST+"sparql/update",
             LANGUAGE : "en",
             DEBUG : false
         }
@@ -64,7 +64,7 @@
         });
 
         function showRDF(uri){
-            window.open(HOST+"sparql/select?query="+encodeURIComponent("CONSTRUCT{?s ?p ?o}WHERE{?s ?p ?o.FILTER(?s=<"+uri+">)}"));
+            window.open(HOST+"sparql/select?query="+encodeURIComponent("CONSTRUCT{?s ?p ?o}WHERE{?s ?p ?o.FILTER(?s=<"+uri+">)}")+"&format=html");
         }
     </script>
     <link type="text/css" rel="stylesheet" href="css/font-awesome.css">
