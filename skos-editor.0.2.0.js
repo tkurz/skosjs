@@ -1755,7 +1755,7 @@ function SKOSEditor(options) {
         });
         events.bind(EventCode.CONCEPT.DELETE,function(event){
             var deleteGraph = function() {
-                skos._delete.graph()
+                skos._delete.graph();
             }
 
             var deleteSchemeAll = function() {

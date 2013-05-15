@@ -222,12 +222,12 @@ function SKOSClient(sparqlClient,options) {
             sparqlClient.update(query, onsuccess, onfailure);
         },
         concept : function(graph,uri,onsuccess, onfailure) {
-            var query = "WITH <" + graph + "> DELETE {<"+uri+">?x?z.?a?b<"+uri+">} WHERE {<"+uri+">?x?z.?a?b<"+uri+">}";
+            var query = "WITH <" + graph + "> DELETE {<"+uri+">?x?z.?a?b<"+uri+">} WHERE {<"+uri+">?x?z.OPTIONAL{?a?b<"+uri+">}}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         },
         skosRelations : function(graph,uri,onsuccess, onfailure) {
-            var query = "WITH <" + graph + "> DELETE {<"+uri+"><" + namespaces.SKOS + "broader>?z.?a<" + namespaces.SKOS + "narrower><"+uri+">.<"+uri+"><" + namespaces.SKOS + "narrower>?r.?q<" + namespaces.SKOS + "broader><"+uri+">.<"+uri+"><" + namespaces.SKOS + "topConceptOf>?z.?a<" + namespaces.SKOS + "hasTopConcept><"+uri+">} WHERE {<"+uri+"><" + namespaces.SKOS + "broader>?z.?a<" + namespaces.SKOS + "narrower><"+uri+">.<"+uri+"><" + namespaces.SKOS + "narrower>?r.?q<" + namespaces.SKOS + "broader><"+uri+">.<"+uri+"><" + namespaces.SKOS + "topConceptOf>?z.?a<" + namespaces.SKOS + "hasTopConcept><"+uri+">}";
+            var query = "WITH <" + graph + "> DELETE {<"+uri+"><" + namespaces.SKOS + "broader>?z.?a<" + namespaces.SKOS + "narrower><"+uri+">.<"+uri+"><" + namespaces.SKOS + "narrower>?r.?q<" + namespaces.SKOS + "broader><"+uri+">.<"+uri+"><" + namespaces.SKOS + "topConceptOf>?z.?a<" + namespaces.SKOS + "hasTopConcept><"+uri+">} WHERE {OPTIONAL{<"+uri+"><" + namespaces.SKOS + "broader>?z.?a<" + namespaces.SKOS + "narrower><"+uri+">.}OPTIONAL{<"+uri+"><" + namespaces.SKOS + "narrower>?r.?q<" + namespaces.SKOS + "broader><"+uri+">.}OPTIONAL{<"+uri+"><" + namespaces.SKOS + "topConceptOf>?z.?a<" + namespaces.SKOS + "hasTopConcept><"+uri+">}}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         },
