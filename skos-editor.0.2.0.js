@@ -2072,15 +2072,14 @@ function SKOSEditor(options) {
             var timeout;
 
             $("#"+background).show();
-            $("#" + container).load("html/settings.html", function() {
-                $(".popup_cancel").click(function() {
-                    clearTimeout(timeout);
-                    close();
-                    if(updated)events.fire(new Event(EventCode.SETTINGS.UPDATED));
-                });
-                //write data
-                init();
+            $("#" + container).html(HTML_TEMPLATES.popups.settings);
+            $(".popup_cancel").click(function() {
+                clearTimeout(timeout);
+                close();
+                if(updated)events.fire(new Event(EventCode.SETTINGS.UPDATED));
             });
+            //write data
+            init();
 
             function init() {
 
