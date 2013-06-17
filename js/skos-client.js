@@ -246,7 +246,7 @@ function SKOSClient(sparqlClient,options) {
         graph : function(graph,onsuccess, onfailure) {
             var language = "";
 
-            var query = "SELECT DISTINCT ?title WHERE { {GRAPH <"+graph+"> { <"+graph+"> <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project> }}UNION {GRAPH <"+graph+"> { ?a <"+ namespaces.RDF +"type><" + namespaces.SKOS + "Concept> }}OPTIONAL {<"+graph+"> <" + OPTIONS.LABEL_GRAPH + "> ?title.}}";//FILTER (lang(?title) = '" + language + "')
+            var query = "SELECT DISTINCT ?title WHERE { {GRAPH <"+graph+"> { <"+graph+"> <"+ namespaces.RDF +"type><"+namespaces.SKOSJS+"Project> }}UNION {GRAPH <"+graph+"> { ?a <"+ namespaces.RDF +"type><" + namespaces.SKOS + "Concept> }}OPTIONAL {GRAPH <"+graph+"> {<"+graph+"> <" + OPTIONS.LABEL_GRAPH + "> ?title.}}}";//FILTER (lang(?title) = '" + language + "')
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.select(query, onsuccess, onfailure);
         },
