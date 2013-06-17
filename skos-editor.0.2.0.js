@@ -170,6 +170,24 @@ function SKOSEditor(options) {
 
     //the return object for external interaction
     var return_object = {
+        endpoint : {
+            update : {
+                get : function() {
+                    return client.getUpdateEndpoint();
+                },
+                set : function(value) {
+                    client.setUpdateEndpoint(value);
+                }
+            },
+            select : {
+                get : function() {
+                    return client.getSelectEndpoint();
+                },
+                set : function(value) {
+                    client.setSelectEndpoint(value);
+                }
+            }
+        },
         menu : {
             createMenuItem : function(name,subname,action) {
                 return menu.createMenuItem(name,subname,action);

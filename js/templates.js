@@ -13,7 +13,7 @@ var HTML_TEMPLATES = {
             '<table id="about_info_table">' +
             '   <tr><td class="title">Version</td><td>0.2.0 (alpha)</td></tr>' +
             '   <tr><td class="title">Author</td><td>Thomas Kurz</td></tr>' +
-            '   <tr><td class="title">Owner</td><td>Salzburg Research Forschungsgesellschaft</td></tr>' +
+            //'   <tr><td class="title">Owner</td><td>Salzburg Research Forschungsgesellschaft</td></tr>'
             '   <tr><td class="title">Contact</td><td>thomas.kurz@salzburgresearch.at</td></tr>' +
             '   <tr><td class="title">License</td><td>Apache License, Version 2.0</td></tr>' +
             '</table>',

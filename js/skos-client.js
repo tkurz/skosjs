@@ -347,4 +347,9 @@ function SKOSClient(sparqlClient,options) {
             (minutes<10?("0"+minutes):minutes)+":"+
             (seconds<10?("0"+seconds):seconds);
     }
+
+    this.getSelectEndpoint = function() {}
+    this.setSelectEndpoint = function(value){}
+    this.getUpdateEndpoint = function() {}
+    this.setUpdateEndpoint = function(value){}
 }

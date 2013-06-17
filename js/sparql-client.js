@@ -63,6 +63,11 @@ function SparqlClient(endpointSelect, endpointUpdate) {
             }
         });
     }
+
+    this.getSelectEndpoint = function() {return endpointSelect}
+    this.setSelectEndpoint = function(value){ endpointSelect = value}
+    this.getUpdateEndpoint = function() {return endpointUpdate}
+    this.setUpdateEndpoint = function(value){endpointUpdate = value}
 }
 
 /**

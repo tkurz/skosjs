@@ -27,11 +27,14 @@
     <script type="text/javascript" src="js/sparql-client.js"></script>
     <script type="text/javascript" src="js/skos-client.js"></script>
     <script type="text/javascript" src="extension/simple/SimpleExtension.js"></script>
+    <script type="text/javascript" src="extension/simple/SettingsExtension.js"></script>
     <script type="text/javascript" src="extension/auth/AuthTokenExtension.js"></script>
     <script type="text/javascript" src="js/templates.js"></script>
     <script type="text/javascript" src="skos-editor.0.2.0.js"></script>
 
     <script type="text/javascript">
+
+        var SHOWCASE = true;
 
         var HOST = "http://localhost:8080/";
 
@@ -49,7 +52,9 @@
 
             var editor = new SKOSEditor(OPTIONS);
 
-            var extension = new SimpleExtension(editor);
+            if(SHOWCASE) var extension = new SimpleExtension(editor);
+
+            var settings = new SettingsExtension(editor);
 
             var authTokenExtension = new AuthTokenExtension(editor,"#login");
 
@@ -60,10 +65,14 @@
             **/
 
             editor.init();
+
+            /*if(SHOWCASE) {
+                editor.popup.info("Hi Testuser!","<p style='padding: 0 10px;'>We provide a backend that you can use for testing by default. If you want to try the editor with your custom backend, just set the SPARQL endpoints under Project/Settings</p>");
+            }*/
         });
 
         function showRDF(uri){
-            window.open(HOST+"sparql/select?query="+encodeURIComponent("CONSTRUCT{?s ?p ?o}WHERE{?s ?p ?o.FILTER(?s=<"+uri+">)}")+"&format=html");
+            window.open(HOST+"sparql/select?query="+encodeURIComponent("CONSTRUCT{?s ?p ?o}WHERE{?s ?p ?o.FILTER(?s==<"+uri+">)}")+"&format=html");
         }
     </script>
     <link type="text/css" rel="stylesheet" href="css/font-awesome.css">
