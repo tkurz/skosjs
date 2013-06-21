@@ -29,6 +29,8 @@
     <script type="text/javascript" src="extension/simple/SimpleExtension.js"></script>
     <script type="text/javascript" src="extension/simple/SettingsExtension.js"></script>
     <script type="text/javascript" src="extension/auth/AuthTokenExtension.js"></script>
+    <script type="text/javascript" src="extension/lmf/ioservice.js"></script>
+    <script type="text/javascript" src="extension/lmf/user.js"></script>
     <script type="text/javascript" src="js/templates.js"></script>
     <script type="text/javascript" src="skos-editor.0.2.0.js"></script>
 
@@ -58,6 +60,9 @@
 
             var authTokenExtension = new AuthTokenExtension(editor,"#login");
 
+            var ioservice = new IOService(editor,HOST);
+
+            var user_service = new UserService(editor, HOST);
             /**
             editor.properties.remove("scheme","http://www.w3.org/2000/01/rdf-schema#label");
             editor.properties.add("scheme","http://www.w3.org/2004/02/skos/core#prefLabel",{title:"Label",type:"string",multivalue:false,multilingual:true,editable:true},"right",0);
