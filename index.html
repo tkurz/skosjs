@@ -23,16 +23,20 @@
     <meta charset="UTF-8">
     <!-- TODO -->
     <script type="text/javascript" src="lib/jquery-1.9.1.min.js"></script>
+    <!--
     <script type="text/javascript" src="js/md5.js"></script>
     <script type="text/javascript" src="js/sparql-client.js"></script>
     <script type="text/javascript" src="js/skos-client.js"></script>
+    <script type="text/javascript" src="js/templates.js"></script>
+    <script type="text/javascript" src="skos.js"></script>
+    -->
+    <script type="text/javascript" src="bin/skosjs-0.3.0-SNAPSHOT.min.js"></script>
+
     <script type="text/javascript" src="extension/simple/SimpleExtension.js"></script>
     <script type="text/javascript" src="extension/simple/SettingsExtension.js"></script>
     <script type="text/javascript" src="extension/auth/AuthTokenExtension.js"></script>
     <script type="text/javascript" src="extension/lmf/ioservice.js"></script>
     <script type="text/javascript" src="extension/lmf/user.js"></script>
-    <script type="text/javascript" src="js/templates.js"></script>
-    <script type="text/javascript" src="skos-editor.0.2.0.js"></script>
 
     <script type="text/javascript">
 
@@ -80,6 +84,8 @@
             window.open(HOST+"sparql/select?query="+encodeURIComponent("CONSTRUCT{?s ?p ?o}WHERE{?s ?p ?o.FILTER(?s==<"+uri+">)}")+"&format=html");
         }
     </script>
+
+    <!--
     <link type="text/css" rel="stylesheet" href="css/font-awesome.css">
     <link type="text/css" rel="stylesheet" href="css/basic.css">
     <link type="text/css" rel="stylesheet" href="css/tree.css">
@@ -88,6 +94,9 @@
     <link type="text/css" rel="stylesheet" href="css/view.css">
     <link type="text/css" rel="stylesheet" href="css/menu.css">
     <link type="text/css" rel="stylesheet" href="css/popups.css">
+    -->
+    <link type="text/css" rel="stylesheet" href="bin/skosjs-0.3.0-SNAPSHOT.min.css">
+
 </head>
 <body>
 <div id="header1">

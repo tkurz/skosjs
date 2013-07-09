@@ -218,7 +218,7 @@ function SKOSEditor(options) {
                 return popups.custom(title);
             }
         },
-        properties : { //set properties
+        properties : {
             add : function(type,property,configuration,position,index) {
 
                 position = position ? position : "right";
@@ -241,7 +241,7 @@ function SKOSEditor(options) {
             remove : function(type,property) {
                 var columns = ["left","right"];
                 for(var c in columns) {
-                    for(var i = 0 in PROPERTIES[type][columns[c]]) {
+                    for(var i in PROPERTIES[type][columns[c]]) {
                         if(PROPERTIES[type][columns[c]][i].property == property) {
                             PROPERTIES[type][columns[c]].splice(i,1);break;
                         }
@@ -251,7 +251,7 @@ function SKOSEditor(options) {
             alter : function(type,property,configuration) {
                 var columns = ["left","right"];
                 for(var c in columns) {
-                    for(var i = 0 in PROPERTIES[type][columns[c]]) {
+                    for(var i in PROPERTIES[type][columns[c]]) {
                         if(PROPERTIES[type][columns[c]][i].property == property) {
                             if(configuration.title) PROPERTIES[type][columns[c]][i].title = configuration.title;
                             if(configuration.type) PROPERTIES[type][columns[c]][i].type = configuration.type;

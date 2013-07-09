@@ -36,7 +36,7 @@ function SparqlClient(endpointSelect, endpointUpdate) {
     this.ask = function(query, onsuccess, onfailure) {
         HTTP.get(endpointSelect, {query:encodeURIComponent(query)}, null, "application/sparql-results+json;charset=UTF-8", {
             200:function(data) {
-                var value = JSON.parse(data).boolean;
+                var value = JSON.parse(data)['boolean'];
                 if (onsuccess)onsuccess(String(value) == 'true' ? true : false);
             },
             "default":function(err) {
@@ -120,7 +120,6 @@ function HTTP_Client() {
         request.open(method, _url, true);
         if (method == "PUT" || method == "POST")request.setRequestHeader("Content-Type", mimetype);
         if (method == "GET")request.setRequestHeader("Accept", mimetype);
-        console.log(data);
         request.send(data);
     }
 

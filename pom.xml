@@ -21,15 +21,9 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>at.newmedialab.lmf</groupId>
-        <artifactId>lmf-parent</artifactId>
-        <version>3.1.0-SNAPSHOT</version>
-    </parent>
-
-    <groupId>at.salzburgresearch.skosjs</groupId>
-    <artifactId>skosjs-webjar</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <groupId>com.github.tkurz</groupId>
+    <artifactId>skosjs</artifactId>
+    <version>0.3.0-SNAPSHOT</version>
 
     <packaging>jar</packaging>
 
@@ -41,14 +35,62 @@
     </properties>
 
     <build>
+        <plugins>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>yuicompressor-maven-plugin</artifactId>
+                <version>1.0.0</version>
+                <executions>
+                    <execution>
+                        <id>assemble-javascript</id>
+                        <goals>
+                            <goal>aggregate</goal>
+                        </goals>
+                        <configuration>
+                            <nomunge>false</nomunge>
+                            <sourceDirectory>${project.basedir}</sourceDirectory>
+                            <output>${project.basedir}/bin/${project.artifactId}-${project.version}.min.js</output>
+                            <includes>
+                                <include>js/md5.js</include>
+                                <include>js/sparql-client.js</include>
+                                <include>js/skos-client.js</include>
+                                <include>js/templates.js</include>
+                                <include>skos.js</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>assemble-css</id>
+                        <goals>
+                            <goal>aggregate-css</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>${project.basedir}/css</sourceDirectory>
+                            <output>${project.basedir}/bin/${project.artifactId}-${project.version}.min.css</output>
+                            <includes>
+                                <include>font-awesome.css</include>
+                                <include>basic.css</include>
+                                <include>tree.css</include>
+                                <include>search.css</include>
+                                <include>editor.css</include>
+                                <include>view.css</include>
+                                <include>menu.css</include>
+                                <include>popups.css</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <!--
         <resources>
             <resource>
-                <directory>./</directory>
+                <directory>bin</directory>
                 <filtering>false</filtering>
-                <!--<targetPath>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</targetPath>-->
-                <targetPath>${project.build.outputDirectory}/META-INF/resources/webjars/skosjs</targetPath>
+                <targetPath>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${webjar.version}</targetPath>
             </resource>
         </resources>
+        -->
     </build>
 
 </project>
