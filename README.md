@@ -1,3 +1,7 @@
+VERSION
+=======
+0.2.0-SNAPSHOT
+
 PROJECT
 =======
 SKOSjs is a javascript based editor for Simple Knowledge Organisation System (SKOS) data. It can be used with any SPARQL 1.1 endpoint. It is developed within the
