@@ -43,13 +43,14 @@
                 <executions>
                     <execution>
                         <id>assemble-javascript</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>aggregate</goal>
                         </goals>
                         <configuration>
                             <nomunge>false</nomunge>
                             <sourceDirectory>${project.basedir}</sourceDirectory>
-                            <output>${project.basedir}/bin/${project.artifactId}-${project.version}.min.js</output>
+                            <output>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}.min.js</output>
                             <includes>
                                 <include>js/md5.js</include>
                                 <include>js/sparql-client.js</include>
@@ -61,12 +62,13 @@
                     </execution>
                     <execution>
                         <id>assemble-css</id>
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>aggregate-css</goal>
                         </goals>
                         <configuration>
                             <sourceDirectory>${project.basedir}/css</sourceDirectory>
-                            <output>${project.basedir}/bin/${project.artifactId}-${project.version}.min.css</output>
+                            <output>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}/css/${project.artifactId}-${project.version}.min.css</output>
                             <includes>
                                 <include>font-awesome.css</include>
                                 <include>basic.css</include>
@@ -81,16 +83,47 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>copy-img</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}/img</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/img</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>copy-font</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}/font</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/font</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
-        <!--
-        <resources>
-            <resource>
-                <directory>bin</directory>
-                <filtering>false</filtering>
-                <targetPath>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${webjar.version}</targetPath>
-            </resource>
-        </resources>
-        -->
+
+
     </build>
 
 </project>
