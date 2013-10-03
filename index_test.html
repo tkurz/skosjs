@@ -65,11 +65,12 @@
             var ioservice = new IOService(editor,HOST);
 
             var user_service = new UserService(editor, HOST);
-            /**
-             editor.properties.remove("scheme","http://www.w3.org/2000/01/rdf-schema#label");
-             editor.properties.add("scheme","http://www.w3.org/2004/02/skos/core#prefLabel",{title:"Label",type:"string",multivalue:false,multilingual:true,editable:true},"right",0);
-             editor.properties.alter("scheme","http://purl.org/dc/terms/license",{title:"Licence String",type:"string"});
-             **/
+
+            // to test adding and boolean values
+            //editor.properties.remove("scheme","http://www.w3.org/2000/01/rdf-schema#label");
+            //editor.properties.alter("scheme","http://purl.org/dc/terms/license",{title:"Licence String",type:"string"});
+
+            editor.properties.add("graph","http://example.org/value/is_enabled",{title:"Is enabled",type:"boolean",editable:true,confirm:false},"right",0);
 
             editor.init();
 

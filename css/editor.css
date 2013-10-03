@@ -63,3 +63,7 @@ ul.tree {
     border:1px solid gray;
     border-top: none;
 }
+
+.list_values .check {
+    margin: 10px;
+}

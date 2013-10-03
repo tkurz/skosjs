@@ -104,10 +104,11 @@ function SKOSClient(sparqlClient,options) {
     }
 
     this.set = {
-        value : function(graph, uri, property, value, language, onsuccess, onfailure) {
+        value : function(graph, uri, property, value, language, type, onsuccess, onfailure) {
             var datetime = currentDateTime();
             language = language&&language!='none'?"@"+language:"";
-            var query = "WITH <" + graph + "> DELETE {<" + uri + "><"+ namespaces.DC_TERMS+"modified>?_mod} INSERT {<" + uri + "> <" + property + ">\"" + value + "\"" + language + ";<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#dateTime>} WHERE {OPTIONAL {<" + uri + "><"+ namespaces.DC_TERMS+"modified>?_mod}}";
+            type = type ? "^^<"+type+">" : "";
+            var query = "WITH <" + graph + "> DELETE {<" + uri + "><"+ namespaces.DC_TERMS+"modified>?_mod} INSERT {<" + uri + "> <" + property + ">\"" + value + "\"" + type + language + ";<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#dateTime>} WHERE {OPTIONAL {<" + uri + "><"+ namespaces.DC_TERMS+"modified>?_mod}}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         },
@@ -174,10 +175,11 @@ function SKOSClient(sparqlClient,options) {
     }
 
     this.update = {
-        value : function(graph,uri,property,value_old,value_new,language,onsuccess, onfailure) {
+        value : function(graph,uri,property,value_old,value_new,type,language,onsuccess, onfailure) {
             var datetime = currentDateTime();
             language = language&&language!='none'?"@"+language:"";
-            var query = "WITH <" + graph + "> DELETE {<" + uri + "> <" + property + "> \"" + value_old + "\"" + language + ";<"+ namespaces.DC_TERMS+"modified>?_mod} INSERT {<" + uri + "> <" + property + "> \"" + value_new + "\"" + language + ";<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#dateTime>.} WHERE {<" + uri + "> <" + property + "> \"" + value_old + "\"" + language + ".OPTIONAL {<" + uri + "><"+ namespaces.DC_TERMS+"modified>?_mod}}";
+            type = type ? "^^<"+type+">" : "";
+            var query = "WITH <" + graph + "> DELETE {<" + uri + "> <" + property + "> \"" + value_old + "\"" + type + language + ";<"+ namespaces.DC_TERMS+"modified>?_mod} INSERT {<" + uri + "> <" + property + "> \"" + value_new + "\"" + type + language + ";<"+ namespaces.DC_TERMS+"modified>\""+datetime+"\"^^<http://www.w3.org/2001/XMLSchema#dateTime>.} WHERE {<" + uri + "> <" + property + "> \"" + value_old + "\"" + type + language + ".OPTIONAL {<" + uri + "><"+ namespaces.DC_TERMS+"modified>?_mod}}";
             if(OPTIONS.DEBUG)console.debug(query);
             sparqlClient.update(query, onsuccess, onfailure);
         },

@@ -1251,6 +1251,77 @@ function SKOSEditor(options) {
                 case 'text' : return new StringPropertyView(options.title,options.property,options.multilingual,options.multivalue,options.editable,true);
                 case 'uri' : return new UriPropertyView(options.title,options.property,options.multivalue,options.editable);
                 case 'concept' : return new ConceptPropertyView(options.title,options.property,options.droppable,options.editable);
+                case 'boolean' : return new BooleanPropertyView(options.title,options.property,options.editable,options.confirm);
+            }
+        }
+
+        function BooleanPropertyView(title,property,editable,confirm) {
+
+            var box = $("<div></div>").addClass("content_box").append($("<h1></h1>").text(title));
+            var container = $("<div></div>").appendTo(box);
+            load();
+            this.getBox = function() {
+                return box;
+            }
+            this.getType = function() {
+                return "boolean";
+            }
+            this.getProperty = function() {
+                return property;
+            }
+            this.reload = function() {
+                load();
+            }
+
+            //get properties
+            function load(){
+                skos.list.values(graph,current.uri,property,write,function(){popups.alert("Alert","could not list values "+property)});
+            }
+
+            //write properties
+            function write(data) {
+                container.empty();
+
+                var checkbox = $("<input type='checkbox'>").addClass("check");
+                if(!editable) checkbox.attr("disabled","disabled");
+                if(data.length!=0 && data[0].value.value == "true") checkbox.prop("checked",true);
+                $("<div></div>").addClass('list_values').append(checkbox).appendTo(container);
+
+                var isNew = data.length == 0;
+
+                checkbox.click(function() {
+                    var _inner_self = this;
+                    function setValue() {
+                        if(!isNew) {
+                            skos.update.value(graph, current.uri, property,!$(_inner_self).is(':checked'),$(_inner_self).is(':checked'),"http://www.w3.org/2001/XMLSchema#boolean",null,function(){
+                                load();
+                            },function(){
+                                alert("Could not set value!");
+                            });
+                        } else {
+                            skos.set.value(graph, current.uri, property,$(_inner_self).is(':checked'),null,"http://www.w3.org/2001/XMLSchema#boolean",function(){
+                                load();
+                            },function(){
+                                alert("Could not set value!");
+                            });
+                        }
+                    }
+
+                    if(confirm) {
+                        //open confirm dialoge
+                        var popup = popups.confirm("Warning","Are you sure you want to set '"+title+"' to '"+($(this).is(':checked') ? "true" : "false")+"'?",[{
+                            title:"Yes",
+                            action:function() {
+                                setValue();
+                            }
+                        }]);
+                        popup.onclose = function(){ console.log($(_inner_self).is(':checked')+"13")
+                             $(_inner_self).prop("checked",!$(_inner_self).is(':checked'));
+                        }
+                    } else {
+                        setValue();
+                    }
+                });
             }
         }
 
@@ -1336,7 +1407,7 @@ function SKOSEditor(options) {
                             templ2.find(".literal_save").click(function() {
                                 var n3str = templ2.find(".literal_input").val().n3escape();
                                 var htmlStr = templ2.find(".literal_input").val().n3escapeToHMTL();
-                                skos.update.value(graph, current.uri, property, templ1.find(".literal_text").attr('original').n3escape(), n3str, language, function() {
+                                skos.update.value(graph, current.uri, property, templ1.find(".literal_text").attr('original').n3escape(), n3str, undefined, language, function() {
                                     events.fire(new Event(EventCode.PROPERTY.UPDATED, {uri:current.uri,property:property,language:language,value:n3str}, source));
                                     events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[current.uri]}));
                                     templ1.find(".literal_text").html(htmlStr);
@@ -1379,7 +1450,7 @@ function SKOSEditor(options) {
                                 if (inp == "") {
                                     popups.alert("Alert","value must not be empty");
                                 } else {
-                                    skos.set.value(graph,current.uri,property,inp,language,function(){
+                                    skos.set.value(graph,current.uri,property,inp,language,undefined,function(){
                                         events.fire(new Event(EventCode.PROPERTY.CREATED,{uri:current.uri,property:property,language:language,value:inp},source));
                                         events.fire(new Event(EventCode.CONCEPT.UPDATED,{uris:[current.uri]}));
                                         load();
@@ -1854,10 +1925,13 @@ function SKOSEditor(options) {
 
         }
         this.alert = function(title,message) {
-            new Alert(title,message);
+            return new Alert(title,message);
+        }
+        this.confirm = function(title,message,func) {
+            return new Confirm(title,message,func);
         }
         this.info = function(title,message) {
-            new Info(title,message);
+            return new Info(title,message);
         }
         this.custom = function(title) {
             return new CustomPopup(title);
@@ -1865,6 +1939,9 @@ function SKOSEditor(options) {
 
         //func is an array of objects {title:t,action:f}
         function Confirm(title,message,func) {
+            var _conf_self = this;
+            this.onclose = undefined;
+
             $("#"+background).show();
             $("#" + container).html(HTML_TEMPLATES.popups.confirm);
             $("#popup_title").text(title);
@@ -1873,6 +1950,7 @@ function SKOSEditor(options) {
                 close();
             });
             $("#popup_cancel").click(function() {
+                if(_conf_self.onclose) _conf_self.onclose();
                 close();
             });
             var buttons = $("#popup_button_list");
@@ -1885,9 +1963,11 @@ function SKOSEditor(options) {
             function buildButton(func) {
                 var b = $("<button></button>").text(func.title).click(function(){
                     func.action();
+                    close();
                 });
                 return b;
             }
+
         }
 
         function CustomPopup(title) {
