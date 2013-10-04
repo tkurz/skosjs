@@ -21,16 +21,16 @@
     <title>SKOSjs Thesaurus Manager</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta charset="UTF-8">
-    <!-- TODO -->
-    <script type="text/javascript" src="lib/jquery-1.9.1.min.js"></script>
-    <!--
+
+    <script type="text/javascript" src="lib/jquery-1.10.2.min.js"></script>
+
     <script type="text/javascript" src="js/md5.js"></script>
     <script type="text/javascript" src="js/sparql-client.js"></script>
     <script type="text/javascript" src="js/skos-client.js"></script>
     <script type="text/javascript" src="js/templates.js"></script>
     <script type="text/javascript" src="skos.js"></script>
-    -->
-    <script type="text/javascript" src="bin/skosjs-0.3.0-SNAPSHOT.min.js"></script>
+
+    <!--<script type="text/javascript" src="bin/skosjs-0.3.0-SNAPSHOT.min.js"></script>-->
 
     <script type="text/javascript" src="extension/simple/SimpleExtension.js"></script>
     <script type="text/javascript" src="extension/simple/SettingsExtension.js"></script>
@@ -42,14 +42,14 @@
 
         var SHOWCASE = true;
 
-        var HOST = "http://localhost:8080/";
+        var HOST = "fuseki/ds/";
 
         var OPTIONS = {
             RDF_LINK : function(uri){showRDF(uri)},
             BASE_URI : HOST+"resource/",
             LANGUAGES_SUPPORTED : ["en","de"],
-            ENDPOINT_SELECT : HOST+"sparql/select",
-            ENDPOINT_UPDATE : HOST+"sparql/update",
+            ENDPOINT_SELECT : HOST+"query",
+            ENDPOINT_UPDATE : HOST+"update",
             LANGUAGE : "en",
             DEBUG : false
         }
@@ -73,11 +73,13 @@
             editor.properties.alter("scheme","http://purl.org/dc/terms/license",{title:"Licence String",type:"string"});
             **/
 
+            editor.properties.add("graph","http://example.org/value/is_enabled",{title:"Is enabled",type:"boolean",editable:true,confirm:false},"right",0);
+
             editor.init();
 
-            /*if(SHOWCASE) {
+            if(SHOWCASE) {
                 editor.popup.info("Hi Testuser!","<p style='padding: 0 10px;'>We provide a backend that you can use for testing by default. If you want to try the editor with your custom backend, just set the SPARQL endpoints under Project/Settings</p>");
-            }*/
+            }
         });
 
         function showRDF(uri){
@@ -85,7 +87,7 @@
         }
     </script>
 
-    <!--
+
     <link type="text/css" rel="stylesheet" href="css/font-awesome.css">
     <link type="text/css" rel="stylesheet" href="css/basic.css">
     <link type="text/css" rel="stylesheet" href="css/tree.css">
@@ -94,8 +96,8 @@
     <link type="text/css" rel="stylesheet" href="css/view.css">
     <link type="text/css" rel="stylesheet" href="css/menu.css">
     <link type="text/css" rel="stylesheet" href="css/popups.css">
-    -->
-    <link type="text/css" rel="stylesheet" href="bin/skosjs-0.3.0-SNAPSHOT.min.css">
+
+    <!--<link type="text/css" rel="stylesheet" href="bin/skosjs-0.3.0-SNAPSHOT.min.css">-->
 
 </head>
 <body>
