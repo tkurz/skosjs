@@ -91,20 +91,20 @@ function HTTP_Client() {
     }
 
     //build a query param string
-    function buildQueryParms(params) {
-        if (params == null || params.length == 0) return "";
-        var s = "?"
+    function buildQueryUrl(url, params) {
+        if (params == null || params.length == 0) return url;
+        var s = (url.indexOf('?')>=0)?"&":"?"
         if(auth_token != undefined) s += "auth_token=" + auth_token + "&";
         for (prop in params) {
             s += prop + "=" + params[prop] + "&";
         }
-        return s.substring(0, s.length - 1);
+        return url+s.substring(0, s.length - 1);
     }
 
     //fire request, the method takes a callback object which can contain several callback functions for different HTTP Response codes
     function doRequest(method, path, queryParams, data, mimetype, callbacks) {
         mimetype = mimetype || "application/json;charset=UTF-8";
-        var _url = path + buildQueryParms(queryParams);
+        var _url = buildQueryUrl(path, queryParams);
         var request = createRequest();
         request.onreadystatechange = function() {
             if (request.readyState == 4) {
