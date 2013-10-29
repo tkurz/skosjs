@@ -23,7 +23,7 @@
 
     <groupId>com.github.tkurz</groupId>
     <artifactId>skosjs</artifactId>
-    <version>0.3.0</version>
+    <version>0.3.1-SNAPSHOT</version>
 
     <packaging>jar</packaging>
 
@@ -49,7 +49,7 @@
 
     <scm>
         <developerConnection>scm:git:https://github.com/tkurz/skosjs.git</developerConnection>
-      <tag>skosjs-0.3.0</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <build>
