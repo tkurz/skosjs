@@ -75,7 +75,7 @@
                         <configuration>
                             <nomunge>false</nomunge>
                             <sourceDirectory>${project.basedir}</sourceDirectory>
-                            <output>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}/${project.artifactId}-${project.version}.min.js</output>
+                            <output>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}/${project.artifactId}.min.js</output>
                             <includes>
                                 <include>js/md5.js</include>
                                 <include>js/sparql-client.js</include>
@@ -93,7 +93,7 @@
                         </goals>
                         <configuration>
                             <sourceDirectory>${project.basedir}/css</sourceDirectory>
-                            <output>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}/css/${project.artifactId}-${project.version}.min.css</output>
+                            <output>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}/css/${project.artifactId}.min.css</output>
                             <includes>
                                 <include>font-awesome.css</include>
                                 <include>basic.css</include>
