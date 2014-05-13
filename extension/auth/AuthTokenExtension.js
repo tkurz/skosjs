@@ -40,18 +40,25 @@ function AuthTokenExtension(editor,container) {
         var popup;
         var self = this;
 
-        this.onLogin = function(name,pwd){}
+        this.onLogin = function(name,pwd,authtype){}
 
         this.open = function(){
             popup = editor.popup.custom("Login");
 
             var name = $("<input>");
             var pwd = $("<input>").attr("type","password");
+            var radioToken = $("<input>").attr("type","radio").attr("name","authtype").attr("value","token").attr("id","rToken").attr("checked","true");
+            var radioTokenLabel = $("<label>").attr("for","rToken").text("Token Authentication");
+            var radioDigest = $("<input>").attr("type","radio").attr("name","authtype").attr("value","digest").attr("id","rDigest");
+            var radioDigestLabel = $("<label>").attr("for","rDigest").text("Digest Authentication");
             var button = $("<button></button>").text("Login").click(function(){
-                self.onLogin(name.val(),pwd.val());
+                var radioAnswer = undefined;
+                if(radioToken.is(':checked')) radioAnswer = "token";
+                else if(radioDigest.is(':checked')) radioAnswer = "digest";
+                self.onLogin(name.val(),pwd.val(),radioAnswer);
             });
 
-            popup.setContent($("<div style='text-align: center'></div>").append(name).append("<br>").append(pwd).append("<br>").append(button));
+            popup.setContent($("<div style='text-align: center'></div>").append(name).append("<br>").append(pwd).append("<br>").append(radioToken).append(radioTokenLabel).append("<br>").append(radioDigest).append(radioDigestLabel).append("<br>").append(button));
             popup.open();
         }
 
@@ -71,7 +78,7 @@ function AuthTokenExtension(editor,container) {
 
     //logout process
     function logout() {
-        editor.authentification.setAuthToken(undefined);
+        editor.authentification.setAuth(undefined, undefined, undefined);
         createLogin();
         if(graph != undefined) editor.event.fire(new Event(editor.EventCode.GRAPH.LOAD,{uri:graph.uri,title:graph.title}));
     }
@@ -82,8 +89,8 @@ function AuthTokenExtension(editor,container) {
         var popup = new Popup();
         popup.open();
 
-        function onsuccess(name, token) {
-            editor.authentification.setAuthToken(token);
+        function onsuccess(name, pwd, token) {            
+            editor.authentification.setAuth(name, pwd, token);            
             createLogout(name);
             if(graph != undefined) editor.event.fire(new Event(editor.EventCode.GRAPH.LOAD,{uri:graph.uri,title:graph.title}));
             popup.close();
@@ -95,9 +102,15 @@ function AuthTokenExtension(editor,container) {
         }
 
         //TODO this function must be replaced by a real getToken method
-        function getToken(name,pwd) {
+        function getToken(name,pwd,authtype) {
             var token = "xyzabc";
-            onsuccess(name, token);
+            if(authtype == "token") {
+                // token retrieval should be implemented here                
+            }
+            else if(authtype == "digest") {
+                token = undefined;
+            }                
+            onsuccess(name, pwd, token);
         }
 
         popup.onLogin = getToken;

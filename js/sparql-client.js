@@ -7,8 +7,8 @@ function SparqlClient(endpointSelect, endpointUpdate) {
 
     var HTTP = new HTTP_Client();
 
-    this.setAuthToken = function(token) {
-        HTTP.setAuthToken(token);
+    this.setAuth = function(user, pass, token) {
+        HTTP.setAuth(user, pass, token);
     }
 
     /**
@@ -77,6 +77,8 @@ function SparqlClient(endpointSelect, endpointUpdate) {
 function HTTP_Client() {
 
     var auth_token = undefined;
+    var auth_user = undefined;
+    var auth_pass = undefined;
 
     function createRequest() {
         var request = null;
@@ -116,10 +118,11 @@ function HTTP_Client() {
                     throw "Status:" + request.status + ",Text:" + request.responseText;
                 }
             }
-        };
-        request.open(method, _url, true);
-        if (method == "PUT" || method == "POST")request.setRequestHeader("Content-Type", mimetype);
-        if (method == "GET")request.setRequestHeader("Accept", mimetype);
+        };        
+        if (auth_token == undefined) request.open(method, _url, true, auth_user, auth_pass);
+        else request.open(method, _url, true);
+        if (method == "PUT" || method == "POST") request.setRequestHeader("Content-Type", mimetype);
+        if (method == "GET") request.setRequestHeader("Accept", mimetype);
         request.send(data);
     }
 
@@ -139,7 +142,9 @@ function HTTP_Client() {
         doRequest("DELETE", path, queryParams, data, mimetype, callbacks);
     }
 
-    this.setAuthToken = function(token) {
+    this.setAuth = function(user, pass, token) {
+        auth_user = user;
+        auth_pass = pass;
         auth_token = token;
     }
 }
