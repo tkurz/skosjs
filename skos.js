@@ -268,8 +268,8 @@ function SKOSEditor(options) {
             init();
         },
         authentification: {
-            setAuthToken : function(token) {
-                client.setAuthToken(token);
+            setAuth : function(user, pass, token) {
+                client.setAuth(user, pass, token);
             }
         }
     }
