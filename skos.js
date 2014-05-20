@@ -813,7 +813,7 @@ function SKOSEditor(options) {
             var current_uri = data.uri.value;
             var loadChildren = type=='scheme'? skos.list.top_concepts : skos.list.narrower;
             var _child_type = type=='scheme'?"top-concept":"concept";
-            if(data.children.value.bool()) {
+            if(data.children.value.bool() || data.children.value == 1) {
                 _more.addClass('plus');
                 _more.click(function(){
                     if(_more.hasClass('plus')){
