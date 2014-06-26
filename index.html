@@ -40,19 +40,18 @@
 
     <script type="text/javascript">
 
-        var SHOWCASE = true;
+        var SHOWCASE = false;
 
-        var HOST = "fuseki/ds/";
+        var HOST = "http://localhost:3030/";
 
         var OPTIONS = {
             RDF_LINK : function(uri){showRDF(uri)},
-            BASE_URI : "https://data.redlink.io/1.0-BETA/resource/",
+            BASE_URI : HOST+"resource/",
             LANGUAGES_SUPPORTED : ["en","de"],
-            ENDPOINT_SELECT : "http://fusepool.openlinksw.com/sparql-skos/",//HOST+"query",
-            ENDPOINT_UPDATE : "http://fusepool.openlinksw.com/sparql-skos/",//HOST+"update",
+            ENDPOINT_SELECT : HOST+"ds/query",
+            ENDPOINT_UPDATE : "http://www.corsproxy.com/"+HOST+"ds/update",
             LANGUAGE : "en",
-            DEBUG : false,
-            USE_PROXY : true
+            DEBUG : false
         }
 
         $(document).ready(function(){
@@ -84,7 +83,7 @@
         });
 
         function showRDF(uri){
-            window.open(HOST+"sparql/select?query="+encodeURIComponent("CONSTRUCT{?s ?p ?o}WHERE{?s ?p ?o.FILTER(?s==<"+uri+">)}")+"&format=html");
+            window.open(HOST+"ds/query?query="+encodeURIComponent("DESCRIBE <"+uri+">")+"&format=text");
         }
     </script>
 
