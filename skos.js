@@ -26,7 +26,8 @@ function SKOSEditor(options) {
         COOKIES_ENABLED : true,
         COOKIE_EXPIRE_DAYS : 7,
         LABEL_GRAPH : "http://purl.org/dc/terms/title",
-        LABEL_SCHEME : "http://www.w3.org/2000/01/rdf-schema#label"
+        LABEL_SCHEME : "http://www.w3.org/2000/01/rdf-schema#label",
+        USE_PROXY : false
     }
 
     $.extend(OPTIONS,options);
@@ -268,8 +269,8 @@ function SKOSEditor(options) {
             init();
         },
         authentification: {
-            setAuthToken : function(token) {
-                client.setAuthToken(token);
+            setAuth : function(user, pass, token) {
+                client.setAuth(user, pass, token);
             }
         }
     }

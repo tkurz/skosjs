@@ -46,12 +46,13 @@
 
         var OPTIONS = {
             RDF_LINK : function(uri){showRDF(uri)},
-            BASE_URI : HOST+"resource/",
+            BASE_URI : "https://data.redlink.io/1.0-BETA/resource/",
             LANGUAGES_SUPPORTED : ["en","de"],
-            ENDPOINT_SELECT : HOST+"query",
-            ENDPOINT_UPDATE : HOST+"update",
+            ENDPOINT_SELECT : "http://fusepool.openlinksw.com/sparql-skos/",//HOST+"query",
+            ENDPOINT_UPDATE : "http://fusepool.openlinksw.com/sparql-skos/",//HOST+"update",
             LANGUAGE : "en",
-            DEBUG : false
+            DEBUG : false,
+            USE_PROXY : true
         }
 
         $(document).ready(function(){
