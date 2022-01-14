@@ -12,7 +12,7 @@ thomas.kurz@salzburgresearch.at
 
 Online demo
 ===========
-[tkurz.github.com/skosjs](http://tkurz.github.com/skosjs/)
+[tkurz.github.io/skosjs](http://tkurz.github.io/skosjs/)
 
 LICENSE
 =======
